@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudyScape - Login/Register</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <h1>StudyScape - Login</h1>
+      <button class="home-btn" onclick="window.location.href='index.html'">Home</button>
+    </div>
+  </header>
+  <main class="login-container">
+    <div class="register-section">
+      <h2>Register</h2>
+      <form id="register-form">
+        <input type="text" id="new-username" placeholder="Create Username" required>
+        <input type="password" id="new-password" placeholder="Create Password" required>
+        <button type="submit">Register</button>
+        <a href="signin.html"> Back to Sign In </a>
+      </form>
+    </div>
+  </main>
+</body>
+</html>
+
+
+<script>
+
+    // Registration functionality
+    document.getElementById("register-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const username = document.getElementById("new-username").value;
+      const password = document.getElementById("new-password").value;
+
+      const users = JSON.parse(localStorage.getItem("users") || "{}");
+
+      if (users[username]) {
+        alert("Username already exists.");
+      } else {
+        users[username] = password;
+        localStorage.setItem("users", JSON.stringify(users));
+        alert("Registration successful! Please log in");
+      }
+    });
+  </script>
+</body>
+</html>

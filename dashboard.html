@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Welcome, <span id="user-name"></span></h1>
+  </header>
+  <main>
+    <button class="flashcards-btn" onclick="window.location.href='flashcards.html'">Flashcards</button>
+    <button class ="quizzes-btn" onclick="window.location.href='quizzes.html'">Quizzes</button>
+    <button class ="notes-btn" onclick="window.location.href='notes.html'">Notes</button>
+    <button class ="logout-btn" onclick="logout()">Logout</button>
+  </main>
+
+  <script>
+    const user = localStorage.getItem("loggedInUser");
+    if (!user) {
+      window.location.href = "login.html";
+    }
+    document.getElementById("user-name").textContent = user;
+
+    function logout() {
+      localStorage.removeItem("loggedInUser");
+      window.location.href = "index.html";
+    }
+  </script>
+</body>
+</html>

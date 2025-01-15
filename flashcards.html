@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flashcards</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1><b>Flashcards</b></h1>
+    <button onclick="window.location.href='dashboard.html'" class="dashboard-btn">Back to Dashboard</button>
+  </header>
+  <body>
+    <div id="main-container">
+        <div class="flashcard-action">
+            <button id="btn-new-flashcard">
+                <span class="material-symbols-outlined"></span>
+                Add New Flashcard
+            </button>
+        </div>
+        <div class="flashcards"></div>
+    </div>
+    <div id="form-modal">
+        <div class="form-modal-backdrop">
+            <div class="form-modal-dialog">
+                <button class="form-modal-close dynapuff-font">X</button>
+                <h4 class="form-modal-title dynapuff-font"><strong>Add New Flashcard</strong></h4>
+                <form action="" id="flashcard-form">
+                    <input type="hidden" id="fc_id">
+                    <div class="form-group">
+                        <label for="question" class="form-label">Flashcard Question:</label>
+                        <textarea id="question" name="question" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="answer" class="form-label"> Flashcard Answer:</label>
+                        <textarea id="answer" name="answer" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="form-group-action">
+                        <button class="btn-form-action">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
