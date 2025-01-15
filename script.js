@@ -9,133 +9,126 @@ document.querySelectorAll("nav button").forEach((button) => {
     });
 });
 // Flashcard item element
-const flashcard_item = $(`<div class="card">
-    <div class="card-container">
-        <div class="card-front">
-            <h4 class="card-front-title dynapuff-font">Question</h4>
-            <div class="card-front-text dynapuff-font">Sample only 123</div>
-            <div class="card-back-action"><button class="card-action"><span class="material-symbols-outlined">delete</span></button></div>
-            </div>
-        <div class="card-back">
-            <h4 class="card-back-title dynapuff-font">Answer</h4>
-            <div class="card-back-text dynapuff-font">Sample only 123</div>
-        </div>
-    </div>
-    </div>`)
-    
-    // Flashcard Items Container
-    const flashcardContainer = $(`.flashcards`)
-    // Flashcard Form Modal
-    const flashcardModal = $(`#form-modal`)
-    // Flashcard Form
-    const FCForm = $(`#flashcard-form`)
-    // New Flashcard Item Button
-    const newFCButton = $(`#btn-new-flashcard`)
-    // Flashcard Modal Close Button
-    const FCCloseButton = $(`#form-modal .form-modal-close`)
-    // Stored Flashcard Data
-    var FCData = localStorage.getItem('fc_data') || '[]';
-    FCData = JSON.parse(FCData);
-    
-    // New Flashcard Button Click Event Listener
-    newFCButton.click(function (e) {
-        e.preventDefault();
-        FCForm[0].reset();
-        $('#fc_id').val("")
-        flashcardModal.addClass("shown");
-    })
-    
-    // Flashcard Modal Close Button Click Event Listener
-    FCCloseButton.click(function (e) {
-        e.preventDefault()
-        FCForm[0].reset();
-        $('#fc_id').val("")
-        if (flashcardModal.hasClass("shown"))
-            flashcardModal.removeClass("shown");
-    })
-    
-    // Generate New Flashcard Item ID
-    function generateNewID() {
-        var id = 0;
-        if (FCData.length > 0) {
-            for (var i = 0; i < FCData.length; i++) {
-                if (id < FCData[i].id) {
-                    id = FCData[i].id;
-                }
-            }
-        }
-        id++;
-        return id;
+const container = document.querySelector(".container");
+const addQuestionCard = document.getElementById("add-question-card");
+const cardButton = document.getElementById("save-btn");
+const question = document.getElementById("question");
+const answer = document.getElementById("answer");
+const errorMessage = document.getElementById("error");
+const addQuestion = document.getElementById("add-flashcard");
+const closeBtn = document.getElementById("close-btn");
+let editBool = false;
+
+//Add question when user clicks 'Add Flashcard' button
+addQuestion.addEventListener("click", () => {
+  container.classList.add("hide");
+  question.value = "";
+  answer.value = "";
+  addQuestionCard.classList.remove("hide");
+});
+
+//Hide Create flashcard Card
+closeBtn.addEventListener(
+  "click",
+  (hideQuestion = () => {
+    container.classList.remove("hide");
+    addQuestionCard.classList.add("hide");
+    if (editBool) {
+      editBool = false;
+      submitQuestion();
     }
-    
-    // New Flashcard submit event
-    FCForm.submit(function (e) {
-        e.preventDefault();
-        var id = $('#fc_id').val()
-        if (id == "") {
-            id = generateNewID();
-            FCData.push({ id: id, question: $(`#question`).val(), answer: $(`#answer`).val() });
-        } else {
-            for (var i = 0; i < FCData.length; i++) {
-                if (id == FCData[i].id) {
-                    FCData[i] = { id: id, question: $(`#question`).val(), answer: $(`#answer`).val() };
-                }
-            }
-        }
-    
-        FCForm[0].reset();
-        $('#fc_id').val("")
-        localStorage.setItem("fc_data", JSON.stringify(FCData));
-        load_flashcards();
-        if (flashcardModal.hasClass("shown"))
-            flashcardModal.removeClass("shown");
-    })
-    
-    // Load Flashcard Items
-    function load_flashcards() {
-        flashcardContainer.html("")
-        for (var i = 0; i < FCData.length; i++) {
-            var data = FCData[i];
-            var fc_item = flashcard_item.clone(true);
-            fc_item.find(`.card-front-text`).text(data.question)
-            fc_item.find(`.card-back-text`).text(data.answer)
-            fc_item[0].dataset.id = data.id
-            flashcardContainer.append(fc_item)
-    
-            // Flashcard item card flip event to view answer
-            fc_item.click(function (e) {
-                e.preventDefault()
-                var buttonHtml = new RegExp(($(this).find("button.card-action")[0].outerHTML), "i");
-    
-                if ($.contains($(this).find("button.card-action")[0], e.target) || $(this).find("button.card-action")[0] == e.target)
-                    return;
-                if ($(this).hasClass("active")) {
-                    $(this).removeClass("active")
-                } else {
-                    $(this).addClass("active")
-                }
-            })
-    
-            // Flashcard item card delete button event
-            fc_item.find("button.card-action").click(function (e) {
-                e.preventDefault()
-                var id = $(this).closest(".card")[0].dataset.id
-                if (confirm(`Are you sure to delete this Flashcard Item`)) {
-                    for (var z = 0; z < FCData.length; z++) {
-                        if (id == FCData[z].id) {
-                            delete FCData[z];
-                            FCData = FCData.filter(elm => elm)
-    
-                            localStorage.setItem("fc_data", JSON.stringify(FCData));
-                            load_flashcards();
-                        }
-                    }
-                }
-            })
-        }
+  })
+);
+
+//Submit Question
+cardButton.addEventListener(
+  "click",
+  (submitQuestion = () => {
+    editBool = false;
+    tempQuestion = question.value.trim();
+    tempAnswer = answer.value.trim();
+    if (!tempQuestion || !tempAnswer) {
+      errorMessage.classList.remove("hide");
+    } else {
+      container.classList.remove("hide");
+      errorMessage.classList.add("hide");
+      viewlist();
+      question.value = "";
+      answer.value = "";
     }
-    
-    $(document).ready(function () {
-        // Load flashcards
-        load_flashcards();
-    })
+  })
+);
+
+//Card Generate
+function viewlist() {
+  var listCard = document.getElementsByClassName("card-list-container");
+  var div = document.createElement("div");
+  div.classList.add("card");
+  //Question
+  div.innerHTML += `
+  <p class="question-div">${question.value}</p>`;
+  //Answer
+  var displayAnswer = document.createElement("p");
+  displayAnswer.classList.add("answer-div", "hide");
+  displayAnswer.innerText = answer.value;
+
+  //Link to show/hide answer
+  var link = document.createElement("a");
+  link.setAttribute("href", "#");
+  link.setAttribute("class", "show-hide-btn");
+  link.innerHTML = "Show/Hide Answer";
+  link.addEventListener("click", () => {
+    displayAnswer.classList.toggle("hide");
+  });
+
+  div.appendChild(link);
+  div.appendChild(displayAnswer);
+
+  //Edit button
+  let buttonsCon = document.createElement("div");
+  buttonsCon.classList.add("buttons-con");
+  var editButton = document.createElement("button");
+  editButton.setAttribute("class", "edit");
+  editButton.innerHTML = `<i class="fa-solid fa-pen-to-square"></i>`;
+  editButton.addEventListener("click", () => {
+    editBool = true;
+    modifyElement(editButton, true);
+    addQuestionCard.classList.remove("hide");
+  });
+  buttonsCon.appendChild(editButton);
+  disableButtons(false);
+
+  //Delete Button
+  var deleteButton = document.createElement("button");
+  deleteButton.setAttribute("class", "delete");
+  deleteButton.innerHTML = `<i class="fa-solid fa-trash-can"></i>`;
+  deleteButton.addEventListener("click", () => {
+    modifyElement(deleteButton);
+  });
+  buttonsCon.appendChild(deleteButton);
+
+  div.appendChild(buttonsCon);
+  listCard[0].appendChild(div);
+  hideQuestion();
+}
+
+//Modify Elements
+const modifyElement = (element, edit = false) => {
+  let parentDiv = element.parentElement.parentElement;
+  let parentQuestion = parentDiv.querySelector(".question-div").innerText;
+  if (edit) {
+    let parentAns = parentDiv.querySelector(".answer-div").innerText;
+    answer.value = parentAns;
+    question.value = parentQuestion;
+    disableButtons(true);
+  }
+  parentDiv.remove();
+};
+
+//Disable edit and delete buttons
+const disableButtons = (value) => {
+  let editButtons = document.getElementsByClassName("edit");
+  Array.from(editButtons).forEach((element) => {
+    element.disabled = value;
+  });
+};
