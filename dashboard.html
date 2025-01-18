@@ -5,27 +5,100 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard</title>
   <link rel="stylesheet" href="style.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+  <style>
+    /* Navbar Styles */
+    .navbar {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 10px 20px;
+      background-color: #0073e6;
+      color: white;
+    }
+
+    .navbar .profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-right: 30px;
+    }
+
+    .navbar .profile i {
+      font-size: 20px;
+    }
+
+    .navbar .profile .username {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .navbar .nav-links {
+      display: flex;
+      gap: 15px;
+    }
+
+    .navbar .nav-links a {
+      color: white;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 500;
+      padding: 8px 12px;
+      border-radius: 5px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .navbar .nav-links a:hover {
+      background-color: #005bb5;
+      color: #eaf4fc;
+    }
+
+    /* Main Content */
+    .main-content {
+      padding: 20px;
+    }
+
+    /* Responsive Navbar */
+    @media screen and (max-width: 768px) {
+      .navbar .nav-links {
+        flex-wrap: wrap;
+        justify-content: flex-start;
+      }
+    }
+  </style>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 <body>
-  <header>
-    <h1>Welcome, <span id="user-name"></span></h1>
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="profile">
+      <i class="fas fa-user-circle"></i>
+      <span class="username" id="user-name"></span>
+    </div>
+    <nav class="nav-links">
+      <a href="flashcards.html">Flashcards</a>
+      <a href="quizzes.html">Quizzes</a>
+      <a href="notes.html">Notes</a>
+      <a href="schedule.html">Schedule</a>
+      <a href="timer.html">Timer</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </nav>
   </header>
-  <main>
-      <button class="flashcards-btn" onclick="window.location.href='flashcards.html'">Flashcards</button>
-      <button class ="quizzes-btn" onclick="window.location.href='quizzes.html'">Quizzes</button>
-      <button class ="notes-btn" onclick="window.location.href='notes.html'">Notes</button>
-      <button class ="schedule-btn" onclick="window.location.href='schedule.html'">Schedule</button>
-      <button class ="timer-btn" onclick="window.location.href='timer.html'">Timer</button>
-      <button class ="logout-btn" onclick="logout()">Logout</button>
+
+  <!-- Main Content -->
+  <main class="main-content" id="main-content">
+    <p>Select an option from the menu to get started.</p>
   </main>
 
   <script>
+    // Display username in navbar
     const user = localStorage.getItem("loggedInUser");
     if (!user) {
       window.location.href = "login.html";
     }
     document.getElementById("user-name").textContent = user;
 
+    // Logout functionality
     function logout() {
       localStorage.removeItem("loggedInUser");
       window.location.href = "index.html";

@@ -14,50 +14,297 @@
   />
   <link rel="stylesheet" href="style.css">
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <style>
+    /* Deck and Flashcard Styling */
+    .deck-container, .flashcard-container {
+      text-align: center;
+      margin: 20px;
+    }
+
+    .deck-container button,
+    .flashcard-container button {
+      background-color: #0073e6;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+    }
+
+    .deck-container button:hover,
+    .flashcard-container button:hover {
+      background-color: #005bb5;
+    }
+
+    .card {
+      margin: 10px auto;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background-color: #ffffff;
+      box-shadow: 0 0.4em 1.2em rgba(28, 0, 80, 0.08);
+      max-width: 300px;
+    }
+
+    .card p {
+      margin: 10px 0;
+    }
+
+    .buttons-con {
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .buttons-con button {
+      background: transparent;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .buttons-con button.edit {
+      color: #0073e6;
+    }
+
+    .buttons-con button.edit:hover {
+      color: #005bb5;
+    }
+
+    .buttons-con button.delete {
+      color: #ff5353;
+    }
+
+    .buttons-con button.delete:hover {
+      color: #cc0000;
+    }
+
+    .hide {
+      display: none;
+    }
+  </style>
 </head>
 <body>
   <header>
     <h1><b>Flashcards</b></h1>
     <button onclick="window.location.href='dashboard.html'" class="dashboard-btn">Back to Dashboard</button>
   </header>
-  <body>
-    <div class="container">
-      <div class="add-flashcard-con">
-        <button id="add-flashcard">Add Flashcard</button>
-      </div>
-      <!-- Display Card of Question And Answers Here -->
-      <div id="card-con">
-        <div class="card-list-container"></div>
-      </div>
+  <main>
+    <!-- Deck Management -->
+    <div class="deck-container">
+      <h2>Your Decks</h2>
+      <button id="add-deck-btn">+ Add Deck</button>
+      <div id="deck-list"></div>
     </div>
-    <!-- Input form for users to fill question and answer -->
-    <div class="question-container hide" id="add-question-card">
+
+    <!-- Flashcard Management (hidden until deck is selected) -->
+    <div class="flashcard-container hide" id="flashcard-section">
+      <h2 id="deck-title"></h2>
+      <button id="add-flashcard-btn">+ Add Flashcard</button>
+      <button id="back-to-decks-btn">← Back to Decks</button>
+      <div id="flashcard-list" class="card-list-container"></div>
+    </div>
+
+    <!-- Modal for Deck Creation -->
+    <div class="question-container hide" id="add-deck-modal">
+      <h2>Create Deck</h2>
+      <label for="deck-name">Deck Name:</label>
+      <textarea id="deck-name" placeholder="Enter deck name"></textarea>
+      <button id="save-deck-btn">Save Deck</button>
+    </div>
+
+    <!-- Modal for Flashcard Creation -->
+    <div class="question-container hide" id="add-flashcard-modal">
       <h2>Add Flashcard</h2>
-      <div class="wrapper">
-        <!-- Error message -->
-        <div class="error-con">
-          <span class="hide" id="error">Input fields cannot be empty!</span>
-        </div>
-        <!-- Close Button -->
-        <i class="fa-solid fa-xmark" id="close-btn"></i>
-      </div>
       <label for="question">Question:</label>
-      <textarea
-        class="input"
-        id="question"
-        placeholder="Type the question here..."
-        rows="2"
-      ></textarea>
+      <textarea id="question" placeholder="Type the question here..."></textarea>
       <label for="answer">Answer:</label>
-      <textarea
-        class="input"
-        id="answer"
-        rows="4"
-        placeholder="Type the answer here..."
-      ></textarea>
-      <button id="save-btn">Save</button>
+      <textarea id="answer" placeholder="Type the answer here..."></textarea>
+      <button id="save-flashcard-btn">Save Flashcard</button>
     </div>
-    <!-- Script -->
-    <script src="script.js"></script>
-  </body>
+  </main>
+  <script>
+    // Get the current logged-in user
+const currentUser = localStorage.getItem("loggedInUser");
+if (!currentUser) {
+  window.location.href = "login.html"; // Redirect if no user is logged in
+}
+
+// Get user-specific decks
+let decks = JSON.parse(localStorage.getItem(`decks_${currentUser}`)) || {};
+let currentDeck = null;
+
+// Elements
+const deckList = document.getElementById("deck-list");
+const flashcardSection = document.getElementById("flashcard-section");
+const addDeckBtn = document.getElementById("add-deck-btn");
+const saveDeckBtn = document.getElementById("save-deck-btn");
+const deckNameInput = document.getElementById("deck-name");
+const backToDecksBtn = document.getElementById("back-to-decks-btn");
+const deckTitle = document.getElementById("deck-title");
+const addFlashcardBtn = document.getElementById("add-flashcard-btn");
+const saveFlashcardBtn = document.getElementById("save-flashcard-btn");
+const questionInput = document.getElementById("question");
+const answerInput = document.getElementById("answer");
+const flashcardList = document.getElementById("flashcard-list");
+
+// Update Deck List
+function updateDeckList() {
+  deckList.innerHTML = "";
+  Object.keys(decks).forEach((deckName) => {
+    const deckDiv = document.createElement("div");
+    deckDiv.classList.add("card");
+    deckDiv.innerHTML = `
+      <p>${deckName}</p>
+      <button onclick="openDeck('${deckName}')">Open</button>
+      <button onclick="deleteDeck('${deckName}')">Delete</button>
+    `;
+    deckList.appendChild(deckDiv);
+  });
+}
+
+// Open a Deck
+function openDeck(deckName) {
+  currentDeck = deckName;
+  deckTitle.textContent = `Deck: ${deckName}`;
+  flashcardSection.classList.remove("hide");
+  document.querySelector(".deck-container").classList.add("hide");
+  loadFlashcards();
+}
+
+// Delete a Deck
+function deleteDeck(deckName) {
+  delete decks[deckName];
+  saveDecks();
+  updateDeckList();
+}
+
+// Add a Deck
+addDeckBtn.addEventListener("click", () => {
+  document.getElementById("add-deck-modal").classList.remove("hide");
+});
+
+saveDeckBtn.addEventListener("click", () => {
+  const deckName = deckNameInput.value.trim();
+  if (deckName && !decks[deckName]) {
+    decks[deckName] = [];
+    saveDecks();
+    updateDeckList();
+    document.getElementById("add-deck-modal").classList.add("hide");
+    deckNameInput.value = "";
+  }
+});
+
+// Back to Decks
+backToDecksBtn.addEventListener("click", () => {
+  flashcardSection.classList.add("hide");
+  document.querySelector(".deck-container").classList.remove("hide");
+  currentDeck = null;
+});
+
+// Add Flashcard Button Click
+addFlashcardBtn.addEventListener("click", () => {
+  document.getElementById("add-flashcard-modal").classList.remove("hide");
+});
+
+saveFlashcardBtn.addEventListener("click", () => {
+  const question = questionInput.value.trim();
+  const answer = answerInput.value.trim();
+  if (question && answer && currentDeck) {
+    decks[currentDeck].push({ question, answer });
+    saveDecks();
+    loadFlashcards();
+    document.getElementById("add-flashcard-modal").classList.add("hide");
+    questionInput.value = "";
+    answerInput.value = "";
+  }
+});
+
+// Load Flashcards for Current Deck
+function loadFlashcards() {
+  flashcardList.innerHTML = "";
+  if (!currentDeck) return;
+
+  const flashcards = decks[currentDeck];
+  flashcards.forEach((card, index) => {
+    const cardDiv = document.createElement("div");
+    cardDiv.classList.add("card");
+
+    // Question
+    cardDiv.innerHTML += `<p class="question-div">${card.question}</p>`;
+
+    // Answer (hidden by default)
+    const displayAnswer = document.createElement("p");
+    displayAnswer.classList.add("answer-div", "hide");
+    displayAnswer.innerText = card.answer;
+
+    // Show/Hide Button
+    const toggleAnswerBtn = document.createElement("a");
+    toggleAnswerBtn.setAttribute("href", "#");
+    toggleAnswerBtn.setAttribute("class", "show-hide-btn");
+    toggleAnswerBtn.innerText = "Show/Hide Answer";
+    toggleAnswerBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      displayAnswer.classList.toggle("hide");
+    });
+
+    cardDiv.appendChild(toggleAnswerBtn);
+    cardDiv.appendChild(displayAnswer);
+
+    // Edit/Delete Buttons
+    const buttonsCon = document.createElement("div");
+    buttonsCon.classList.add("buttons-con");
+
+    const editButton = document.createElement("button");
+    editButton.classList.add("edit");
+    editButton.innerHTML = `<i class="fa-solid fa-pen-to-square"></i>`;
+    editButton.addEventListener("click", () => {
+      editFlashcard(index);
+    });
+    buttonsCon.appendChild(editButton);
+
+    const deleteButton = document.createElement("button");
+    deleteButton.classList.add("delete");
+    deleteButton.innerHTML = `<i class="fa-solid fa-trash-can"></i>`;
+    deleteButton.addEventListener("click", () => {
+      deleteFlashcard(index);
+    });
+    buttonsCon.appendChild(deleteButton);
+
+    cardDiv.appendChild(buttonsCon);
+    flashcardList.appendChild(cardDiv);
+  });
+}
+
+// Edit Flashcard
+function editFlashcard(index) {
+  const flashcard = decks[currentDeck][index];
+  questionInput.value = flashcard.question;
+  answerInput.value = flashcard.answer;
+  decks[currentDeck].splice(index, 1); // Temporarily remove for editing
+  saveDecks();
+  document.getElementById("add-flashcard-modal").classList.remove("hide");
+}
+
+// Delete Flashcard
+function deleteFlashcard(index) {
+  decks[currentDeck].splice(index, 1);
+  saveDecks();
+  loadFlashcards();
+}
+
+// Save Decks to LocalStorage
+function saveDecks() {
+  localStorage.setItem(`decks_${currentUser}`, JSON.stringify(decks));
+}
+
+// Initialize Deck List on Page Load
+document.addEventListener("DOMContentLoaded", () => {
+  updateDeckList();
+});
+
+  </script>
+</body>
 </html>

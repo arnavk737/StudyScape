@@ -234,13 +234,17 @@ body {
     color: #414a67;
   }
   .show-hide-btn {
-    display: block;
-    background-color: #587ef4;
-    color: #ffffff;
+    display: inline-block;
+    margin: 10px 0;
+    color: #0073e6;
     text-decoration: none;
-    text-align: center;
-    padding: 0.6em 0;
-    border-radius: 0.3em;
+    font-size: 14px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
+  
+  .show-hide-btn:hover {
+    color: #005bb5;
   }
   .buttons-con {
     display: flex;
@@ -437,7 +441,67 @@ body {
   form button:hover {
     background-color: #005bb5;
   }
+
+
+  /* Timer Design */
+
   
+  .base-timer {
+    position: relative;
+    width: 300px;
+    height: 300px;
+  }
+  
+  .base-timer__svg {
+    transform: scaleX(-1);
+  }
+  
+  .base-timer__circle {
+    fill: none;
+    stroke: none;
+  }
+  
+  .base-timer__path-elapsed {
+    stroke-width: 7px;
+    stroke: grey;
+  }
+  
+  .base-timer__path-remaining {
+    stroke-width: 7px;
+    stroke-linecap: round;
+    transform: rotate(90deg);
+    transform-origin: center;
+    transition: 1s linear all;
+    fill-rule: nonzero;
+    stroke: currentColor;
+  }
+  
+  .base-timer__path-remaining.green {
+    color: rgb(65, 184, 131);
+  }
+  
+  .base-timer__path-remaining.orange {
+    color: orange;
+  }
+  
+  .base-timer__path-remaining.red {
+    color: red;
+  }
+  
+  .base-timer__label {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+  }
+  
+
+
+
   /* Footer (if needed in the future) */
   footer {
     text-align: center;
