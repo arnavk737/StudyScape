@@ -22,7 +22,6 @@ body {
     margin: 0;
   }
   /* Login/Home Button */
-  .login-btn,
   .home-btn {
     position: fixed;
     top: auto;
@@ -37,7 +36,6 @@ body {
     transition: 0.3s ease;
   }
   
-  .login-btn:hover,
   .home-btn:hover {
     background-color: #005bb5;
     color: white;
