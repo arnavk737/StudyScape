@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tools</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="header">
+    <h1>Tools</h1>
+    <button onclick="window.location.href='dashboard.html'" class="dashboard-btn">Back to Dashboard</button>
+  </header>
+
+  <main class="tools-container">
+    <div class="button-container">
+      <button onclick="showCalculator('graphing')" class="toggle-btn">Graphing Calculator</button>
+      <button onclick="showCalculator('scientific')" class="toggle-btn">Scientific Calculator</button>
+    </div>
+
+    <div id="graphing-calculator" class="calculator">
+        <iframe src="https://ti84calc.com/ti84calc" width="600px" height="800px" frameborder="0" allow="fullscreen"></iframe>
+    </div>
+
+    <div id="scientific-calculator" class="calculator hidden">
+        <iframe src="https://ti84calc.com/ti30calc" width="600px" height="800px" frameborder="0" allow="fullscreen"></iframe>
+    </div>
+  </main>
+
+  <script>
+    function showCalculator(type) {
+      document.getElementById("graphing-calculator").classList.add("hidden");
+      document.getElementById("scientific-calculator").classList.add("hidden");
+
+      if (type === "graphing") {
+        document.getElementById("graphing-calculator").classList.remove("hidden");
+      } else {
+        document.getElementById("scientific-calculator").classList.remove("hidden");
+      }
+    }
+  </script>
+
+  <style>
+    .tools-container {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .button-container {
+      margin-bottom: 20px;
+    }
+
+    .toggle-btn {
+      padding: 10px 20px;
+      margin: 5px;
+      font-size: 16px;
+      border: none;
+      background-color: #0073e6;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .toggle-btn:hover {
+      background-color: #005bb5;
+    }
+
+    .calculator {
+      display: flex;
+      justify-content: center;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+
+</body>
+</html>

@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="stylesheet" href="style.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
   <style>
@@ -15,6 +16,7 @@
       padding: 10px 20px;
       background-color: #0073e6;
       color: white;
+      position: relative;
     }
 
     .navbar .profile {
@@ -22,6 +24,8 @@
       align-items: center;
       gap: 10px;
       margin-right: 30px;
+      position: relative;
+      cursor: pointer;
     }
 
     .navbar .profile i {
@@ -31,6 +35,35 @@
     .navbar .profile .username {
       font-size: 16px;
       font-weight: 600;
+    }
+
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background-color: white;
+      color: black;
+      border-radius: 5px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      min-width: 150px;
+      z-index: 10;
+    }
+
+    .dropdown-menu a {
+      display: block;
+      padding: 10px;
+      text-decoration: none;
+      color: black;
+      font-size: 14px;
+    }
+
+    .dropdown-menu a:hover {
+      background-color: #f1f1f1;
+    }
+
+    .show {
+      display: block;
     }
 
     .navbar .nav-links {
@@ -53,6 +86,10 @@
       color: #eaf4fc;
     }
 
+    .time {
+      margin-left: auto;
+    }
+
     /* Main Content */
     .main-content {
       padding: 20px;
@@ -71,9 +108,13 @@
 <body>
   <!-- Navbar -->
   <header class="navbar">
-    <div class="profile">
+    <div class="profile" id="profile-dropdown">
       <i class="fas fa-user-circle"></i>
       <span class="username" id="user-name"></span>
+      <div class="dropdown-menu" id="dropdown-menu">
+        <a href="settings.html">Settings</a>
+        <a href="#" onclick="logout()">Logout</a>
+      </div>
     </div>
     <nav class="nav-links">
       <a href="flashcards.html">Flashcards</a>
@@ -81,7 +122,10 @@
       <a href="notes.html">Notes</a>
       <a href="schedule.html">Schedule</a>
       <a href="timer.html">Timer</a>
-      <a href="#" onclick="logout()">Logout</a>
+      <a href="tools.html">Tools</a>
+    </nav>
+    <nav class="time">
+      <iframe src="https://free.timeanddate.com/clock/i9rkh6po/n833/fcfff/tct/pct/ftb/ts1" frameborder="0" width="76" height="18" allowtransparency="true"></iframe>
     </nav>
   </header>
 
@@ -98,9 +142,25 @@
     }
     document.getElementById("user-name").textContent = user;
 
+    // Profile dropdown functionality
+    const profileDropdown = document.getElementById("profile-dropdown");
+    const dropdownMenu = document.getElementById("dropdown-menu");
+    
+    profileDropdown.addEventListener("click", () => {
+      dropdownMenu.classList.toggle("show");
+    });
+    
+    window.addEventListener("click", (event) => {
+      if (!profileDropdown.contains(event.target)) {
+        dropdownMenu.classList.remove("show");
+      }
+    });
+
     // Logout functionality
     function logout() {
-      localStorage.removeItem("loggedInUser");
+      document.cookie = "authToken=; path=/; max-age=0";
+      document.cookie = "savedEmail=; path=/; max-age=0";
+      sessionStorage.removeItem("loggedInUser");
       window.location.href = "index.html";
     }
   </script>
