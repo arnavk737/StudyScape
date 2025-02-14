@@ -19,7 +19,7 @@
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone <https://github.com/arnavk737/StudyScape>
    ```
 
 2. Navigate to the project directory:
