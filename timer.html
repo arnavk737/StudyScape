@@ -3,15 +3,425 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Timer</title>
+  <title>Study Timer - StudyScape</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      color: white;
+      font-size: 1.75rem;
+    }
+
+    .back-btn {
+      padding: 0.75rem 1.5rem;
+      background: white;
+      color: #667eea;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .back-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255,255,255,0.3);
+    }
+
+    .container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .timer-card {
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 30px;
+      padding: 3rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      text-align: center;
+      max-width: 500px;
+      width: 100%;
+    }
+
+    .mode-selector {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 3rem;
+      background: #f1f5f9;
+      padding: 0.5rem;
+      border-radius: 12px;
+    }
+
+    .mode-btn {
+      flex: 1;
+      padding: 0.75rem;
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .mode-btn.active {
+      background: white;
+      color: #667eea;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .timer-display {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      margin: 0 auto 3rem;
+    }
+
+    .timer-circle {
+      width: 100%;
+      height: 100%;
+    }
+
+    .timer-bg {
+      fill: none;
+      stroke: #e2e8f0;
+      stroke-width: 8;
+    }
+
+    .timer-progress {
+      fill: none;
+      stroke: url(#gradient);
+      stroke-width: 8;
+      stroke-linecap: round;
+      transform: rotate(-90deg);
+      transform-origin: center;
+      transition: stroke-dashoffset 1s linear;
+    }
+
+    .timer-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 4rem;
+      font-weight: 800;
+      color: #1e293b;
+    }
+
+    .timer-label {
+      position: absolute;
+      top: 65%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.25rem;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    .controls {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+
+    .control-btn {
+      width: 70px;
+      height: 70px;
+      border: none;
+      border-radius: 50%;
+      font-size: 1.75rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+
+    .play-btn {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .play-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 12px 35px rgba(102, 126, 234, 0.5);
+    }
+
+    .reset-btn {
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      box-shadow: 0 8px 25px rgba(240, 147, 251, 0.4);
+    }
+
+    .reset-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 12px 35px rgba(240, 147, 251, 0.5);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      padding: 2rem;
+      background: #f8fafc;
+      border-radius: 16px;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #667eea;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      color: #64748b;
+    }
+
+    @media (max-width: 768px) {
+      .timer-card {
+        padding: 2rem;
+      }
+
+      .timer-display {
+        width: 250px;
+        height: 250px;
+      }
+
+      .timer-text {
+        font-size: 3rem;
+      }
+
+      .control-btn {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+      }
+    }
+  </style>
 </head>
 <body>
   <header>
-    <h1><b>Pomodoro / Regular Timer</b></h1>
-    <div id="timerr"></div>
-    <button onclick="window.location.href='dashboard.html'" class="dashboard-btn">Back to Dashboard</button>
+    <h1>⏱️ Study Timer</h1>
+    <button class="back-btn" onclick="window.location.href='dashboard.html'">
+      <i class="fas fa-arrow-left"></i> Dashboard
+    </button>
   </header>
+
+  <div class="container">
+    <div class="timer-card">
+      <div class="mode-selector">
+        <button class="mode-btn active" onclick="setMode('pomodoro')">Pomodoro</button>
+        <button class="mode-btn" onclick="setMode('short')">Short Break</button>
+        <button class="mode-btn" onclick="setMode('long')">Long Break</button>
+      </div>
+
+      <div class="timer-display">
+        <svg class="timer-circle" viewBox="0 0 100 100">
+          <defs>
+            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+            </linearGradient>
+          </defs>
+          <circle class="timer-bg" cx="50" cy="50" r="45"></circle>
+          <circle class="timer-progress" id="progress-circle" cx="50" cy="50" r="45"
+                  stroke-dasharray="283" stroke-dashoffset="0"></circle>
+        </svg>
+        <div class="timer-text" id="timer-display">25:00</div>
+        <div class="timer-label" id="timer-label">Focus Time</div>
+      </div>
+
+      <div class="controls">
+        <button class="control-btn play-btn" id="play-btn" onclick="toggleTimer()">
+          <i class="fas fa-play"></i>
+        </button>
+        <button class="control-btn reset-btn" onclick="resetTimer()">
+          <i class="fas fa-redo"></i>
+        </button>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-value" id="sessions-count">0</div>
+          <div class="stat-label">Sessions</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="total-time">0h 0m</div>
+          <div class="stat-label">Total Time</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const MODES = {
+      pomodoro: { time: 25 * 60, label: 'Focus Time' },
+      short: { time: 5 * 60, label: 'Short Break' },
+      long: { time: 15 * 60, label: 'Long Break' }
+    };
+
+    let currentMode = 'pomodoro';
+    let timeLeft = MODES.pomodoro.time;
+    let totalTime = MODES.pomodoro.time;
+    let isRunning = false;
+    let timerInterval = null;
+    let sessionsCompleted = 0;
+    let totalMinutesStudied = 0;
+
+    const CIRCLE_CIRCUMFERENCE = 283;
+
+    function setMode(mode) {
+      if (isRunning) return;
+      
+      currentMode = mode;
+      timeLeft = MODES[mode].time;
+      totalTime = MODES[mode].time;
+      
+      document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      document.getElementById('timer-label').textContent = MODES[mode].label;
+      updateDisplay();
+    }
+
+    function toggleTimer() {
+      const playBtn = document.getElementById('play-btn');
+      
+      if (isRunning) {
+        isRunning = false;
+        clearInterval(timerInterval);
+        playBtn.innerHTML = '<i class="fas fa-play"></i>';
+      } else {
+        isRunning = true;
+        playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+        timerInterval = setInterval(tick, 1000);
+      }
+    }
+
+    function tick() {
+      if (timeLeft <= 0) {
+        completeSession();
+        return;
+      }
+      
+      timeLeft--;
+      updateDisplay();
+    }
+
+    function completeSession() {
+      isRunning = false;
+      clearInterval(timerInterval);
+      
+      if (currentMode === 'pomodoro') {
+        sessionsCompleted++;
+        totalMinutesStudied += 25;
+        updateStats();
+        playSound();
+      }
+      
+      document.getElementById('play-btn').innerHTML = '<i class="fas fa-play"></i>';
+      alert('Session complete! Take a break.');
+    }
+
+    function resetTimer() {
+      isRunning = false;
+      clearInterval(timerInterval);
+      timeLeft = MODES[currentMode].time;
+      totalTime = MODES[currentMode].time;
+      document.getElementById('play-btn').innerHTML = '<i class="fas fa-play"></i>';
+      updateDisplay();
+    }
+
+    function updateDisplay() {
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+      document.getElementById('timer-display').textContent = 
+        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      
+      const progress = (timeLeft / totalTime) * CIRCLE_CIRCUMFERENCE;
+      document.getElementById('progress-circle').style.strokeDashoffset = 
+        CIRCLE_CIRCUMFERENCE - progress;
+    }
+
+    function updateStats() {
+      document.getElementById('sessions-count').textContent = sessionsCompleted;
+      const hours = Math.floor(totalMinutesStudied / 60);
+      const mins = totalMinutesStudied % 60;
+      document.getElementById('total-time').textContent = `${hours}h ${mins}m`;
+      
+      // Save to localStorage
+      localStorage.setItem('pomodoroSessions', sessionsCompleted);
+      localStorage.setItem('pomodoroMinutes', totalMinutesStudied);
+    }
+
+    function playSound() {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.value = 800;
+      oscillator.type = 'sine';
+      
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.5);
+    }
+
+    // Load saved stats
+    window.addEventListener('DOMContentLoaded', () => {
+      sessionsCompleted = parseInt(localStorage.getItem('pomodoroSessions') || '0');
+      totalMinutesStudied = parseInt(localStorage.getItem('pomodoroMinutes') || '0');
+      updateStats();
+      updateDisplay();
+    });
+
+    // Prevent tab close during session
+    window.addEventListener('beforeunload', (e) => {
+      if (isRunning) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    });
+  </script>
 </body>
 </html>

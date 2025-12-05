@@ -3,132 +3,464 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>StudyScape - Home</title>
-  <link rel="stylesheet" href="style.css">
+  <title>StudyScape - Transform Your Learning</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    /* General Styles */
-    body {
-      font-family: 'Poppins', sans-serif;
+    * {
       margin: 0;
       padding: 0;
-      background: linear-gradient(to right, #0073e6, #005bb5);
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
+      overflow-x: hidden;
     }
 
-    .header {
-      text-align: center;
-      padding: 60px 20px;
-      background-color: transparent;
+    /* Animated Background */
+    .bg-animation {
+      position: fixed;
+      width: 100vw;
+      height: 100vh;
+      top: 0;
+      left: 0;
+      z-index: -1;
+      overflow: hidden;
     }
 
-    .header h1 {
-      font-size: 3rem;
-      font-weight: 700;
-      margin-bottom: 10px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
+    .bg-animation::before {
+      content: '';
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      top: -50%;
+      left: -50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+      background-size: 50px 50px;
+      animation: moveGrid 20s linear infinite;
     }
 
-    .header p {
-      font-size: 1.2rem;
-      margin-bottom: 30px;
+    @keyframes moveGrid {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(50px, 50px); }
     }
 
-    .login-btn {
-      padding: 15px 30px;
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: #0073e6;
-      background-color: white;
-      border: none;
-      border-radius: 30px;
-      cursor: pointer;
-      transition: transform 0.3s ease, background-color 0.3s ease;
+    /* Floating Orbs */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.5;
+      animation: float 20s infinite ease-in-out;
     }
 
-    .login-btn:hover {
-      background-color: #f1f1f1;
-      transform: scale(1.1);
+    .orb1 {
+      width: 400px;
+      height: 400px;
+      background: rgba(147, 51, 234, 0.3);
+      top: 10%;
+      left: 10%;
+      animation-delay: 0s;
     }
 
-    .main {
-      text-align: center;
-      padding: 40px 20px;
+    .orb2 {
+      width: 300px;
+      height: 300px;
+      background: rgba(59, 130, 246, 0.3);
+      bottom: 20%;
+      right: 15%;
+      animation-delay: 5s;
     }
 
-    .description {
-      background-color: white;
-      color: black;
-      padding: 40px;
-      border-radius: 10px;
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-      margin: 0 auto;
-      max-width: 900px;
+    .orb3 {
+      width: 350px;
+      height: 350px;
+      background: rgba(236, 72, 153, 0.3);
+      top: 50%;
+      right: 10%;
+      animation-delay: 10s;
     }
 
-    .description h2 {
-      font-size: 2.5rem;
-      margin-bottom: 20px;
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(50px, -50px) scale(1.1); }
+      50% { transform: translate(-30px, 30px) scale(0.9); }
+      75% { transform: translate(30px, 50px) scale(1.05); }
     }
 
-    .description p {
-      font-size: 1.1rem;
-      margin: 10px 0;
-    }
-
-    .description ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    .description ul li {
-      margin: 10px 0;
-      font-size: 1.1rem;
+    /* Navigation */
+    nav {
       display: flex;
+      justify-content: space-between;
       align-items: center;
+      padding: 2rem 5%;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      animation: slideDown 0.5s ease-out;
     }
 
-    .description ul li::before {
-      content: "✔️";
-      margin-right: 10px;
-      color: #0073e6;
+    @keyframes slideDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
 
-    .description img {
-      margin-top: 30px;
-      border-radius: 10px;
-      max-width: 100%;
-      height: auto;
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(45deg, #fff, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -1px;
+    }
+
+    .nav-btn {
+      padding: 0.8rem 2rem;
+      background: rgba(255, 255, 255, 0.9);
+      color: #667eea;
+      border: none;
+      border-radius: 50px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .nav-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
+      background: white;
+    }
+
+    /* Hero Section */
+    .hero {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 8rem 5% 6rem;
+      text-align: center;
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 7vw, 5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, #fff 0%, #e0e7ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: textShine 3s ease-in-out infinite;
+    }
+
+    @keyframes textShine {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .hero p {
+      font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+      margin-bottom: 3rem;
+      opacity: 0.9;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.6;
+    }
+
+    .cta-btn {
+      padding: 1.2rem 3rem;
+      font-size: 1.2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #f59e0b, #ef4444);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 10px 40px rgba(239, 68, 68, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s;
+    }
+
+    .cta-btn:hover::before {
+      left: 100%;
+    }
+
+    .cta-btn:hover {
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 15px 50px rgba(239, 68, 68, 0.5);
+    }
+
+    /* Features Section */
+    .features {
+      max-width: 1200px;
+      margin: 4rem auto;
+      padding: 4rem 5%;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border-radius: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .features h2 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .feature-card {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 2rem;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.4s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+
+    .feature-card:hover::before {
+      opacity: 1;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .feature-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      display: inline-block;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .feature-card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
+
+    .feature-card p {
+      opacity: 0.85;
+      line-height: 1.6;
+    }
+
+    /* Stats Section */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 4rem auto;
+      padding: 0 5%;
+    }
+
+    .stat-card {
+      text-align: center;
+      padding: 2rem;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: scale(1.05);
+    }
+
+    .stat-number {
+      font-size: 3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .stat-label {
+      font-size: 1rem;
+      opacity: 0.8;
+      margin-top: 0.5rem;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 3rem 5%;
+      background: rgba(0, 0, 0, 0.2);
+      margin-top: 4rem;
+    }
+
+    footer p {
+      opacity: 0.7;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      nav {
+        padding: 1.5rem 5%;
+      }
+
+      .hero {
+        padding: 4rem 5% 3rem;
+      }
+
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
-  <header class="header">
-    <div class="container">
-      <h1>Welcome to StudyScape</h1>
-      <p>Your ultimate study companion for mastering knowledge.</p>
-      <button class="login-btn" onclick="window.location.href='signin.html'">Get Started</button>
+  <div class="bg-animation">
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="orb orb3"></div>
+  </div>
+
+  <nav>
+    <div class="logo">StudyScape ✨</div>
+    <button class="nav-btn" onclick="window.location.href='signin.html'">Get Started</button>
+  </nav>
+
+  <section class="hero">
+    <h1>Transform Your Learning Journey</h1>
+    <p>The ultimate study companion powered by intelligent flashcards, interactive quizzes, and seamless note-taking. Master any subject with confidence.</p>
+    <button class="cta-btn" onclick="window.location.href='signin.html'">Start Learning Free</button>
+  </section>
+
+  <section class="stats">
+    <div class="stat-card">
+      <div class="stat-number">10K+</div>
+      <div class="stat-label">Active Learners</div>
     </div>
-  </header>
-  <main class="main">
-    <section class="description">
-      <h2>Why Choose StudyScape?</h2>
-      <p>
-        StudyScape is your trusted platform for effective learning. Whether you're preparing for exams, managing notes, or mastering flashcards, we empower you to achieve your goals.
-      </p>
-      <p>What you'll love about StudyScape:</p>
-      <ul>
-        <li>Create and organize flashcard decks effortlessly.</li>
-        <li>Take quizzes and track your progress in real time.</li>
-        <li>Save notes and access them anywhere, anytime.</li>
-        <li>Completely free and always available.</li>
-      </ul>
+    <div class="stat-card">
+      <div class="stat-number">50K+</div>
+      <div class="stat-label">Flashcards Created</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">95%</div>
+      <div class="stat-label">Success Rate</div>
+    </div>
+  </section>
 
+  <section class="features">
+    <h2>Everything You Need to Excel</h2>
+    
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🎴</div>
+        <h3>Smart Flashcards</h3>
+        <p>Create unlimited decks with our intuitive interface. Organize by subject and track your mastery progress.</p>
+      </div>
 
-      <img src="https://i0.wp.com/calmatters.org/wp-content/uploads/2021/08/math-curriculum.jpg?fit=2000%2C1500&ssl=1" alt="StudyScape Image">
-    </section>
-  </main>
+      <div class="feature-card">
+        <div class="feature-icon">📝</div>
+        <h3>Rich Note-Taking</h3>
+        <p>Capture ideas with our powerful editor. Add text, drawings, and organize everything beautifully.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">✅</div>
+        <h3>Interactive Quizzes</h3>
+        <p>Test your knowledge with auto-generated quizzes. Get instant feedback and identify weak areas.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">📅</div>
+        <h3>Study Planner</h3>
+        <p>Schedule your study sessions efficiently. Set goals and build consistent learning habits.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">⏱️</div>
+        <h3>Pomodoro Timer</h3>
+        <p>Stay focused with built-in timers. Balance work and rest for optimal productivity.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🔧</div>
+        <h3>Study Tools</h3>
+        <p>Access calculators and utilities. Everything you need in one convenient place.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2024 StudyScape. Built with 💜 for learners everywhere.</p>
+  </footer>
+
+  <script>
+    // Add intersection observer for scroll animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -100px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.feature-card, .stat-card').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(30px)';
+      el.style.transition = 'all 0.6s ease-out';
+      observer.observe(el);
+    });
+  </script>
 </body>
 </html>

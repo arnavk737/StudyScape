@@ -3,77 +3,514 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tools</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <header class="header">
-    <h1>Tools</h1>
-    <button onclick="window.location.href='dashboard.html'" class="dashboard-btn">Back to Dashboard</button>
-  </header>
+  <title>Study Tools - StudyScape</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-  <main class="tools-container">
-    <div class="button-container">
-      <button onclick="showCalculator('graphing')" class="toggle-btn">Graphing Calculator</button>
-      <button onclick="showCalculator('scientific')" class="toggle-btn">Scientific Calculator</button>
-    </div>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+      min-height: 100vh;
+    }
 
-    <div id="graphing-calculator" class="calculator">
-        <iframe src="https://ti84calc.com/ti84calc" width="600px" height="800px" frameborder="0" allow="fullscreen"></iframe>
-    </div>
+    header {
+      background: white;
+      padding: 1.5rem 2rem;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
 
-    <div id="scientific-calculator" class="calculator hidden">
-        <iframe src="https://ti84calc.com/ti30calc" width="600px" height="800px" frameborder="0" allow="fullscreen"></iframe>
-    </div>
-  </main>
+    header h1 {
+      font-size: 1.75rem;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
 
-  <script>
-    function showCalculator(type) {
-      document.getElementById("graphing-calculator").classList.add("hidden");
-      document.getElementById("scientific-calculator").classList.add("hidden");
+    .back-btn {
+      padding: 0.75rem 1.5rem;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
 
-      if (type === "graphing") {
-        document.getElementById("graphing-calculator").classList.remove("hidden");
-      } else {
-        document.getElementById("scientific-calculator").classList.remove("hidden");
+    .back-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .tool-selector {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .tool-tab {
+      padding: 0.875rem 2rem;
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-weight: 600;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .tool-tab:hover {
+      border-color: #667eea;
+      color: #667eea;
+    }
+
+    .tool-tab.active {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .tool-content {
+      display: none;
+      background: white;
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      animation: fadeIn 0.3s;
+    }
+
+    .tool-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
       }
     }
-  </script>
 
-  <style>
-    .tools-container {
+    .calculator-container {
       text-align: center;
-      padding: 20px;
     }
 
-    .button-container {
-      margin-bottom: 20px;
-    }
-
-    .toggle-btn {
-      padding: 10px 20px;
-      margin: 5px;
-      font-size: 16px;
+    .calculator-frame {
       border: none;
-      background-color: #0073e6;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 600px;
+      height: 800px;
+      margin: 0 auto;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.1);
     }
 
-    .toggle-btn:hover {
-      background-color: #005bb5;
+    .unit-converter {
+      max-width: 600px;
+      margin: 0 auto;
     }
 
-    .calculator {
+    .converter-section {
+      margin-bottom: 2rem;
+    }
+
+    .converter-section h3 {
+      color: #1e293b;
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+    }
+
+    .converter-grid {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .input-group {
       display: flex;
-      justify-content: center;
+      flex-direction: column;
+      gap: 0.5rem;
     }
 
-    .hidden {
-      display: none;
+    .input-group label {
+      font-size: 0.9rem;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    .input-group input,
+    .input-group select {
+      padding: 0.875rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-family: inherit;
+      transition: all 0.3s;
+    }
+
+    .input-group input:focus,
+    .input-group select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .swap-btn {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1.5rem;
+    }
+
+    .swap-btn:hover {
+      transform: rotate(180deg);
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .word-counter {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .word-counter textarea {
+      width: 100%;
+      min-height: 300px;
+      padding: 1.5rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-family: inherit;
+      resize: vertical;
+      transition: all 0.3s;
+    }
+
+    .word-counter textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .counter-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .stat-box {
+      background: #f8fafc;
+      padding: 1.25rem;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .stat-box .value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #667eea;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-box .label {
+      font-size: 0.9rem;
+      color: #64748b;
+    }
+
+    @media (max-width: 768px) {
+      .converter-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .swap-btn {
+        margin: 0 auto;
+        transform: rotate(90deg);
+      }
+
+      .calculator-frame {
+        height: 600px;
+      }
     }
   </style>
+</head>
+<body>
+  <header>
+    <h1>🔧 Study Tools</h1>
+    <button class="back-btn" onclick="window.location.href='dashboard.html'">
+      <i class="fas fa-arrow-left"></i> Dashboard
+    </button>
+  </header>
 
+  <div class="container">
+    <div class="tool-selector">
+      <button class="tool-tab active" onclick="showTool('graphing')">
+        <i class="fas fa-chart-line"></i> Graphing Calculator
+      </button>
+      <button class="tool-tab" onclick="showTool('scientific')">
+        <i class="fas fa-calculator"></i> Scientific Calculator
+      </button>
+      <button class="tool-tab" onclick="showTool('converter')">
+        <i class="fas fa-exchange-alt"></i> Unit Converter
+      </button>
+      <button class="tool-tab" onclick="showTool('word-counter')">
+        <i class="fas fa-text-width"></i> Word Counter
+      </button>
+    </div>
+
+    <!-- Graphing Calculator -->
+    <div class="tool-content active" id="graphing">
+      <div class="calculator-container">
+        <h2 style="margin-bottom: 1.5rem; color: #1e293b;">Graphing Calculator</h2>
+        <iframe src="https://ti84calc.com/ti84calc" class="calculator-frame" allow="fullscreen"></iframe>
+      </div>
+    </div>
+
+    <!-- Scientific Calculator -->
+    <div class="tool-content" id="scientific">
+      <div class="calculator-container">
+        <h2 style="margin-bottom: 1.5rem; color: #1e293b;">Scientific Calculator</h2>
+        <iframe src="https://ti84calc.com/ti30calc" class="calculator-frame" allow="fullscreen"></iframe>
+      </div>
+    </div>
+
+    <!-- Unit Converter -->
+    <div class="tool-content" id="converter">
+      <div class="unit-converter">
+        <h2 style="margin-bottom: 2rem; color: #1e293b; text-align: center;">Unit Converter</h2>
+        
+        <div class="converter-section">
+          <h3>Length</h3>
+          <div class="converter-grid">
+            <div class="input-group">
+              <label>From</label>
+              <input type="number" id="length-from" placeholder="0" oninput="convertLength()">
+              <select id="length-from-unit" onchange="convertLength()">
+                <option value="m">Meters</option>
+                <option value="km">Kilometers</option>
+                <option value="cm">Centimeters</option>
+                <option value="mm">Millimeters</option>
+                <option value="mi">Miles</option>
+                <option value="yd">Yards</option>
+                <option value="ft">Feet</option>
+                <option value="in">Inches</option>
+              </select>
+            </div>
+            <button class="swap-btn" onclick="swapLength()">
+              <i class="fas fa-exchange-alt"></i>
+            </button>
+            <div class="input-group">
+              <label>To</label>
+              <input type="number" id="length-to" placeholder="0" readonly>
+              <select id="length-to-unit" onchange="convertLength()">
+                <option value="m">Meters</option>
+                <option value="km">Kilometers</option>
+                <option value="cm">Centimeters</option>
+                <option value="mm">Millimeters</option>
+                <option value="mi">Miles</option>
+                <option value="yd">Yards</option>
+                <option value="ft" selected>Feet</option>
+                <option value="in">Inches</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="converter-section">
+          <h3>Temperature</h3>
+          <div class="converter-grid">
+            <div class="input-group">
+              <label>From</label>
+              <input type="number" id="temp-from" placeholder="0" oninput="convertTemp()">
+              <select id="temp-from-unit" onchange="convertTemp()">
+                <option value="c">Celsius</option>
+                <option value="f">Fahrenheit</option>
+                <option value="k">Kelvin</option>
+              </select>
+            </div>
+            <button class="swap-btn" onclick="swapTemp()">
+              <i class="fas fa-exchange-alt"></i>
+            </button>
+            <div class="input-group">
+              <label>To</label>
+              <input type="number" id="temp-to" placeholder="0" readonly>
+              <select id="temp-to-unit" onchange="convertTemp()">
+                <option value="c">Celsius</option>
+                <option value="f" selected>Fahrenheit</option>
+                <option value="k">Kelvin</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Word Counter -->
+    <div class="tool-content" id="word-counter">
+      <div class="word-counter">
+        <h2 style="margin-bottom: 1.5rem; color: #1e293b; text-align: center;">Word & Character Counter</h2>
+        <textarea id="text-input" placeholder="Type or paste your text here..." oninput="updateCount()"></textarea>
+        <div class="counter-stats">
+          <div class="stat-box">
+            <div class="value" id="word-count">0</div>
+            <div class="label">Words</div>
+          </div>
+          <div class="stat-box">
+            <div class="value" id="char-count">0</div>
+            <div class="label">Characters</div>
+          </div>
+          <div class="stat-box">
+            <div class="value" id="char-no-space-count">0</div>
+            <div class="label">Characters (no spaces)</div>
+          </div>
+          <div class="stat-box">
+            <div class="value" id="sentence-count">0</div>
+            <div class="label">Sentences</div>
+          </div>
+          <div class="stat-box">
+            <div class="value" id="paragraph-count">0</div>
+            <div class="label">Paragraphs</div>
+          </div>
+          <div class="stat-box">
+            <div class="value" id="reading-time">0</div>
+            <div class="label">Reading Time (min)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showTool(toolId) {
+      document.querySelectorAll('.tool-tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tool-content').forEach(content => content.classList.remove('active'));
+      
+      event.target.classList.add('active');
+      document.getElementById(toolId).classList.add('active');
+    }
+
+    // Length Converter
+    const lengthUnits = {
+      m: 1,
+      km: 0.001,
+      cm: 100,
+      mm: 1000,
+      mi: 0.000621371,
+      yd: 1.09361,
+      ft: 3.28084,
+      in: 39.3701
+    };
+
+    function convertLength() {
+      const from = parseFloat(document.getElementById('length-from').value) || 0;
+      const fromUnit = document.getElementById('length-from-unit').value;
+      const toUnit = document.getElementById('length-to-unit').value;
+      
+      const meters = from / lengthUnits[fromUnit];
+      const result = meters * lengthUnits[toUnit];
+      
+      document.getElementById('length-to').value = result.toFixed(6);
+    }
+
+    function swapLength() {
+      const fromValue = document.getElementById('length-from').value;
+      const toValue = document.getElementById('length-to').value;
+      const fromUnit = document.getElementById('length-from-unit').value;
+      const toUnit = document.getElementById('length-to-unit').value;
+      
+      document.getElementById('length-from').value = toValue;
+      document.getElementById('length-to').value = fromValue;
+      document.getElementById('length-from-unit').value = toUnit;
+      document.getElementById('length-to-unit').value = fromUnit;
+      
+      convertLength();
+    }
+
+    // Temperature Converter
+    function convertTemp() {
+      const from = parseFloat(document.getElementById('temp-from').value) || 0;
+      const fromUnit = document.getElementById('temp-from-unit').value;
+      const toUnit = document.getElementById('temp-to-unit').value;
+      
+      let celsius;
+      if (fromUnit === 'c') celsius = from;
+      else if (fromUnit === 'f') celsius = (from - 32) * 5/9;
+      else celsius = from - 273.15;
+      
+      let result;
+      if (toUnit === 'c') result = celsius;
+      else if (toUnit === 'f') result = celsius * 9/5 + 32;
+      else result = celsius + 273.15;
+      
+      document.getElementById('temp-to').value = result.toFixed(2);
+    }
+
+    function swapTemp() {
+      const fromValue = document.getElementById('temp-from').value;
+      const toValue = document.getElementById('temp-to').value;
+      const fromUnit = document.getElementById('temp-from-unit').value;
+      const toUnit = document.getElementById('temp-to-unit').value;
+      
+      document.getElementById('temp-from').value = toValue;
+      document.getElementById('temp-to').value = fromValue;
+      document.getElementById('temp-from-unit').value = toUnit;
+      document.getElementById('temp-to-unit').value = toUnit;
+      
+      convertTemp();
+    }
+
+    // Word Counter
+    function updateCount() {
+      const text = document.getElementById('text-input').value;
+      
+      const words = text.trim().split(/\s+/).filter(word => word.length > 0).length;
+      const chars = text.length;
+      const charsNoSpace = text.replace(/\s/g, '').length;
+      const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0).length;
+      const paragraphs = text.split(/\n\n+/).filter(p => p.trim().length > 0).length;
+      const readingTime = Math.ceil(words / 200); // Average reading speed: 200 words/min
+      
+      document.getElementById('word-count').textContent = words;
+      document.getElementById('char-count').textContent = chars;
+      document.getElementById('char-no-space-count').textContent = charsNoSpace;
+      document.getElementById('sentence-count').textContent = sentences;
+      document.getElementById('paragraph-count').textContent = paragraphs;
+      document.getElementById('reading-time').textContent = readingTime;
+    }
+  </script>
 </body>
 </html>

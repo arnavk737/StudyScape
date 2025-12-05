@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notebook Debug</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <style>
+    body {
+      font-family: monospace;
+      padding: 2rem;
+      background: #1e293b;
+      color: #e2e8f0;
+    }
+    .log {
+      background: #0f172a;
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 8px;
+      border-left: 4px solid #3b82f6;
+    }
+    .error {
+      border-left-color: #ef4444;
+    }
+    .success {
+      border-left-color: #10b981;
+    }
+    button {
+      padding: 0.75rem 1.5rem;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 0.5rem;
+    }
+    button:hover {
+      background: #2563eb;
+    }
+    pre {
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔍 Notebook Debug Tool</h1>
+  <p>This will help us find out what's wrong with notebook loading.</p>
+  
+  <div>
+    <button onclick="testConnection()">1. Test Supabase Connection</button>
+    <button onclick="testUser()">2. Test User Auth</button>
+    <button onclick="testGetNotebooks()">3. Test Get Notebooks</button>
+    <button onclick="testCreateNotebook()">4. Test Create Notebook</button>
+    <button onclick="clearLocalStorage()">Clear localStorage</button>
+  </div>
+  
+  <div id="output"></div>
+
+  <script>
+    function log(message, type = 'log') {
+      const output = document.getElementById('output');
+      const div = document.createElement('div');
+      div.className = `log ${type}`;
+      div.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong><br><pre>${message}</pre>`;
+      output.appendChild(div);
+      console.log(message);
+    }
+
+    async function testConnection() {
+      log('Testing Supabase connection...');
+      try {
+        const { data, error } = await supabase.from('notebooks').select('count');
+        if (error) {
+          log(`❌ Connection Error: ${error.message}`, 'error');
+          log(`Error details: ${JSON.stringify(error, null, 2)}`, 'error');
+        } else {
+          log('✅ Supabase connection working!', 'success');
+        }
+      } catch (err) {
+        log(`❌ Exception: ${err.message}`, 'error');
+      }
+    }
+
+    async function testUser() {
+      log('Testing user authentication...');
+      try {
+        const user = await db.getCurrentUser();
+        if (!user) {
+          log('❌ No user logged in! Please sign in first.', 'error');
+        } else {
+          log(`✅ User logged in: ${user.email}`, 'success');
+          log(`User ID: ${user.id}`, 'success');
+          log(`User metadata: ${JSON.stringify(user.user_metadata, null, 2)}`);
+        }
+      } catch (err) {
+        log(`❌ Error: ${err.message}`, 'error');
+      }
+    }
+
+    async function testGetNotebooks() {
+      log('Testing get notebooks...');
+      try {
+        const user = await db.getCurrentUser();
+        if (!user) {
+          log('❌ No user logged in!', 'error');
+          return;
+        }
+
+        log(`Fetching notebooks for user: ${user.id}`);
+        const { data, error } = await db.getNotebooks(user.id);
+        
+        if (error) {
+          log(`❌ Error getting notebooks: ${error.message}`, 'error');
+          log(`Error details: ${JSON.stringify(error, null, 2)}`, 'error');
+        } else {
+          log(`✅ Found ${data.length} notebooks`, 'success');
+          log(`Notebooks: ${JSON.stringify(data, null, 2)}`);
+          
+          if (data.length > 0) {
+            log(`\nFirst notebook details:`);
+            log(`- ID: ${data[0].id}`);
+            log(`- Name: ${data[0].name}`);
+            log(`- Type: ${data[0].type}`);
+            log(`- Color: ${data[0].color}`);
+            log(`- Pages: ${JSON.stringify(data[0].pages)}`);
+          }
+        }
+      } catch (err) {
+        log(`❌ Exception: ${err.message}`, 'error');
+        log(`Stack: ${err.stack}`, 'error');
+      }
+    }
+
+    async function testCreateNotebook() {
+      log('Testing create notebook...');
+      try {
+        const user = await db.getCurrentUser();
+        if (!user) {
+          log('❌ No user logged in!', 'error');
+          return;
+        }
+
+        const testName = `Test Notebook ${Date.now()}`;
+        log(`Creating notebook: "${testName}"`);
+        
+        const { data, error } = await db.createNotebook(user.id, testName, 'mixed', '667eea,764ba2');
+        
+        if (error) {
+          log(`❌ Error creating notebook: ${error.message}`, 'error');
+          log(`Error details: ${JSON.stringify(error, null, 2)}`, 'error');
+        } else {
+          log(`✅ Notebook created successfully!`, 'success');
+          log(`Notebook data: ${JSON.stringify(data, null, 2)}`);
+          log(`\n✅ Try opening this notebook ID: ${data.id}`);
+          
+          // Test opening it
+          log(`\nTesting if we can retrieve it...`);
+          const { data: notebooks, error: getError } = await db.getNotebooks(user.id);
+          if (getError) {
+            log(`❌ Error retrieving: ${getError.message}`, 'error');
+          } else {
+            const found = notebooks.find(n => n.id === data.id);
+            if (found) {
+              log(`✅ Successfully retrieved the notebook!`, 'success');
+              log(`Retrieved data: ${JSON.stringify(found, null, 2)}`);
+            } else {
+              log(`❌ Notebook not found in list!`, 'error');
+            }
+          }
+        }
+      } catch (err) {
+        log(`❌ Exception: ${err.message}`, 'error');
+        log(`Stack: ${err.stack}`, 'error');
+      }
+    }
+
+    function clearLocalStorage() {
+      localStorage.clear();
+      log('✅ localStorage cleared!', 'success');
+    }
+
+    // Auto-run basic tests on load
+    window.addEventListener('DOMContentLoaded', async () => {
+      log('🚀 Debug tool loaded. Click buttons to run tests.');
+      log(`\nChecking localStorage...`);
+      const notebookId = localStorage.getItem('currentNotebook');
+      if (notebookId) {
+        log(`Found currentNotebook in localStorage: ${notebookId}`);
+      } else {
+        log(`No currentNotebook in localStorage`);
+      }
+    });
+  </script>
+</body>
+</html>

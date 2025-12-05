@@ -3,309 +3,1237 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Flashcards</title>
+  <title>Flashcards - StudyScape</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css"
-    />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
-    rel="stylesheet"
-  />
-  <link rel="stylesheet" href="style.css">
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
   <style>
-    /* Deck and Flashcard Styling */
-    .deck-container, .flashcard-container {
-      text-align: center;
-      margin: 20px;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
-    .deck-container button,
-    .flashcard-container button {
-      background-color: #0073e6;
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+      min-height: 100vh;
+    }
+
+    /* Header */
+    header {
+      background: white;
+      padding: 1.5rem 2rem;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      animation: slideDown 0.4s ease;
+    }
+
+    @keyframes slideDown {
+      from { transform: translateY(-100%); }
+      to { transform: translateY(0); }
+    }
+
+    header h1 {
+      font-size: 1.75rem;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .back-btn {
+      padding: 0.75rem 1.5rem;
+      background: linear-gradient(135deg, #667eea, #764ba2);
       color: white;
       border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
+      border-radius: 10px;
+      font-weight: 600;
       cursor: pointer;
-      font-size: 16px;
-      transition: background-color 0.3s ease;
-    }
-
-    .deck-container button:hover,
-    .flashcard-container button:hover {
-      background-color: #005bb5;
-    }
-
-    .card {
-      margin: 10px auto;
-      padding: 15px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      background-color: #ffffff;
-      box-shadow: 0 0.4em 1.2em rgba(28, 0, 80, 0.08);
-      max-width: 300px;
-    }
-
-    .card p {
-      margin: 10px 0;
-    }
-
-    .buttons-con {
+      transition: all 0.3s ease;
       display: flex;
-      justify-content: space-around;
+      align-items: center;
+      gap: 0.5rem;
     }
 
-    .buttons-con button {
-      background: transparent;
-      border: none;
-      font-size: 18px;
-      cursor: pointer;
-      transition: color 0.3s ease;
+    .back-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
     }
 
-    .buttons-con button.edit {
-      color: #0073e6;
+    /* Container */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
     }
 
-    .buttons-con button.edit:hover {
-      color: #005bb5;
+    /* Deck View */
+    .deck-view {
+      animation: fadeIn 0.5s ease;
     }
 
-    .buttons-con button.delete {
-      color: #ff5353;
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
-    .buttons-con button.delete:hover {
-      color: #cc0000;
-    }
-
-    .hide {
+    .deck-view.hidden {
       display: none;
+    }
+
+    .deck-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .deck-header h2 {
+      font-size: 2rem;
+      color: #1e293b;
+    }
+
+    .add-deck-btn {
+      padding: 0.875rem 2rem;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .add-deck-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .deck-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 2rem;
+    }
+
+    .deck-card {
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      cursor: pointer;
+      position: relative;
+      animation: slideUp 0.5s ease backwards;
+    }
+
+    .deck-card:nth-child(1) { animation-delay: 0.1s; }
+    .deck-card:nth-child(2) { animation-delay: 0.2s; }
+    .deck-card:nth-child(3) { animation-delay: 0.3s; }
+    .deck-card:nth-child(4) { animation-delay: 0.4s; }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .deck-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+      background-size: 200% 100%;
+      animation: shimmer 3s linear infinite;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 0% 0%; }
+      100% { background-position: 200% 0%; }
+    }
+
+    .deck-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+    }
+
+    .deck-card-content {
+      padding: 2rem;
+    }
+
+    .deck-icon-wrapper {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .deck-icon {
+      font-size: 1.75rem;
+      color: white;
+    }
+
+    .deck-card h3 {
+      font-size: 1.5rem;
+      color: #1e293b;
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
+
+    .deck-meta {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      color: #64748b;
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .deck-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .deck-meta i {
+      color: #667eea;
+    }
+
+    .deck-progress {
+      margin-bottom: 1.5rem;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-bottom: 0.5rem;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      border-radius: 10px;
+      transition: width 0.5s ease;
+    }
+
+    .deck-actions {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 0.75rem;
+    }
+
+    .deck-btn {
+      padding: 0.875rem;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .open-btn {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .open-btn:hover {
+      box-shadow: 0 6px 18px rgba(102, 126, 234, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .delete-btn {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .delete-btn:hover {
+      background: #dc2626;
+      color: white;
+    }
+
+    /* Flashcard View */
+    .flashcard-view {
+      display: none;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .flashcard-view.active {
+      display: block;
+    }
+
+    .flashcard-header {
+      background: white;
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .flashcard-header-left {
+      flex: 1;
+    }
+
+    .flashcard-header h2 {
+      font-size: 2rem;
+      color: #1e293b;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .deck-stats {
+      display: flex;
+      gap: 2rem;
+      color: #64748b;
+      font-size: 0.95rem;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .header-btn {
+      padding: 0.875rem 1.75rem;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.95rem;
+    }
+
+    .add-card-btn {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .add-card-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .study-btn {
+      background: linear-gradient(135deg, #43e97b, #38f9d7);
+      color: white;
+      box-shadow: 0 4px 15px rgba(67, 233, 123, 0.3);
+    }
+
+    .study-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(67, 233, 123, 0.4);
+    }
+
+    .back-to-decks-btn {
+      background: #f8fafc;
+      color: #64748b;
+      border: 2px solid #e2e8f0;
+    }
+
+    .back-to-decks-btn:hover {
+      background: #e2e8f0;
+    }
+
+    /* Flashcard Grid */
+    .flashcard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      gap: 2rem;
+    }
+
+    .flashcard {
+      background: white;
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+      animation: slideUp 0.5s ease backwards;
+    }
+
+    .flashcard::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: linear-gradient(180deg, #667eea, #764ba2);
+    }
+
+    .flashcard:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+    }
+
+    .flashcard-number {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .question {
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      padding-right: 2.5rem;
+    }
+
+    .answer-wrapper {
+      margin: 1.5rem 0;
+    }
+
+    .show-answer-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #667eea;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 0.95rem;
+      padding: 0.5rem 1rem;
+      background: #f0f4ff;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+
+    .show-answer-btn:hover {
+      background: #e0e7ff;
+      transform: translateX(5px);
+    }
+
+    .answer {
+      color: #64748b;
+      line-height: 1.6;
+      margin-top: 1rem;
+      padding: 1rem;
+      background: #f8fafc;
+      border-radius: 12px;
+      border-left: 3px solid #667eea;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: all 0.4s ease;
+    }
+
+    .answer.show {
+      max-height: 500px;
+      opacity: 1;
+      margin-top: 1rem;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .card-btn {
+      flex: 1;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .edit-btn {
+      background: #e0e7ff;
+      color: #667eea;
+    }
+
+    .edit-btn:hover {
+      background: #667eea;
+      color: white;
+    }
+
+    .delete-card-btn {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .delete-card-btn:hover {
+      background: #dc2626;
+      color: white;
+    }
+
+    /* Study Mode */
+    .study-mode {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      z-index: 1000;
+      padding: 2rem;
+    }
+
+    .study-mode.active {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .study-card {
+      background: white;
+      border-radius: 30px;
+      padding: 4rem;
+      max-width: 700px;
+      width: 100%;
+      min-height: 400px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.3);
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+    }
+
+    .study-card.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .study-card-front,
+    .study-card-back {
+      backface-visibility: hidden;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      padding: 4rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .study-card-back {
+      transform: rotateY(180deg);
+    }
+
+    .study-progress {
+      position: absolute;
+      top: 2rem;
+      left: 2rem;
+      right: 2rem;
+      color: white;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .study-controls {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .study-control-btn {
+      padding: 1rem 2rem;
+      background: white;
+      color: #667eea;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .study-control-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      animation: fadeIn 0.3s;
+    }
+
+    .modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 2.5rem;
+      border-radius: 24px;
+      max-width: 550px;
+      width: 90%;
+      animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .modal-content h2 {
+      margin-bottom: 2rem;
+      color: #1e293b;
+      font-size: 1.75rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.75rem;
+      color: #334155;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 1rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+
+    .form-group textarea {
+      min-height: 140px;
+      resize: vertical;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .modal-actions button {
+      flex: 1;
+      padding: 1rem;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 1rem;
+    }
+
+    .save-btn {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .save-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .cancel-btn {
+      background: #f8fafc;
+      color: #64748b;
+      border: 2px solid #e2e8f0;
+    }
+
+    .cancel-btn:hover {
+      background: #e2e8f0;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 5rem 2rem;
+      color: #94a3b8;
+    }
+
+    .empty-state i {
+      font-size: 5rem;
+      margin-bottom: 1.5rem;
+      opacity: 0.5;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .empty-state h3 {
+      font-size: 1.5rem;
+      color: #64748b;
+      margin-bottom: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .deck-grid,
+      .flashcard-grid {
+        grid-template-columns: 1fr;
+      }
+
+      header {
+        padding: 1rem;
+      }
+
+      .container {
+        padding: 1rem;
+      }
+
+      .flashcard-header {
+        padding: 1.5rem;
+      }
+
+      .header-actions {
+        width: 100%;
+      }
+
+      .header-btn {
+        flex: 1;
+      }
+
+      .study-card {
+        padding: 2rem;
+      }
     }
   </style>
 </head>
 <body>
   <header>
-    <h1><b>Flashcards</b></h1>
-    <button onclick="window.location.href='dashboard.html'" class="dashboard-btn">Back to Dashboard</button>
+    <h1><i class="fas fa-layer-group"></i> Flashcards</h1>
+    <button class="back-btn" onclick="window.location.href='dashboard.html'">
+      <i class="fas fa-arrow-left"></i> Dashboard
+    </button>
   </header>
-  <main>
-    <!-- Deck Management -->
-    <div class="deck-container">
-      <h2>Your Decks</h2>
-      <button id="add-deck-btn">+ Add Deck</button>
-      <div id="deck-list"></div>
+
+  <div class="container">
+    <!-- Deck List View -->
+    <div class="deck-view" id="deck-view">
+      <div class="deck-header">
+        <h2>Your Decks</h2>
+        <button class="add-deck-btn" onclick="openDeckModal()">
+          <i class="fas fa-plus"></i> New Deck
+        </button>
+      </div>
+      <div class="deck-grid" id="deck-list"></div>
     </div>
 
-    <!-- Flashcard Management (hidden until deck is selected) -->
-    <div class="flashcard-container hide" id="flashcard-section">
-      <h2 id="deck-title"></h2>
-      <button id="add-flashcard-btn">+ Add Flashcard</button>
-      <button id="back-to-decks-btn">← Back to Decks</button>
-      <div id="flashcard-list" class="card-list-container"></div>
+    <!-- Flashcard Detail View -->
+    <div class="flashcard-view" id="flashcard-view">
+      <div class="flashcard-header">
+        <div class="flashcard-header-left">
+          <h2 id="deck-title"><i class="fas fa-layer-group"></i> Loading...</h2>
+          <div class="deck-stats">
+            <div class="stat-item">
+              <i class="fas fa-clone"></i>
+              <span id="card-count">0 cards</span>
+            </div>
+            <div class="stat-item">
+              <i class="fas fa-calendar"></i>
+              <span id="deck-date">Today</span>
+            </div>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="header-btn study-btn" onclick="startStudyMode()">
+            <i class="fas fa-graduation-cap"></i> Study Mode
+          </button>
+          <button class="header-btn add-card-btn" onclick="openCardModal()">
+            <i class="fas fa-plus"></i> Add Card
+          </button>
+          <button class="header-btn back-to-decks-btn" onclick="showDeckView()">
+            <i class="fas fa-arrow-left"></i> Back
+          </button>
+        </div>
+      </div>
+      <div class="flashcard-grid" id="flashcard-list"></div>
     </div>
+  </div>
 
-    <!-- Modal for Deck Creation -->
-    <div class="question-container hide" id="add-deck-modal">
-      <h2>Create Deck</h2>
-      <label for="deck-name">Deck Name:</label>
-      <textarea id="deck-name" placeholder="Enter deck name"></textarea>
-      <button id="save-deck-btn">Save Deck</button>
+  <!-- Study Mode -->
+  <div class="study-mode" id="study-mode">
+    <div class="study-progress">
+      <span id="study-progress-text">Card 1 of 10</span>
+      <button class="study-control-btn" onclick="exitStudyMode()">
+        <i class="fas fa-times"></i> Exit
+      </button>
     </div>
+    <div class="study-card" id="study-card" onclick="flipCard()">
+      <div class="study-card-front">
+        <h2 style="text-align: center; font-size: 1.75rem; color: #1e293b;" id="study-question">Click to reveal answer</h2>
+      </div>
+      <div class="study-card-back">
+        <h3 style="text-align: center; font-size: 1.5rem; color: #64748b;" id="study-answer">Answer</h3>
+      </div>
+    </div>
+    <div class="study-controls">
+      <button class="study-control-btn" onclick="previousCard()">
+        <i class="fas fa-arrow-left"></i> Previous
+      </button>
+      <button class="study-control-btn" onclick="nextCard()">
+        Next <i class="fas fa-arrow-right"></i>
+      </button>
+    </div>
+  </div>
 
-    <!-- Modal for Flashcard Creation -->
-    <div class="question-container hide" id="add-flashcard-modal">
-      <h2>Add Flashcard</h2>
-      <label for="question">Question:</label>
-      <textarea id="question" placeholder="Type the question here..."></textarea>
-      <label for="answer">Answer:</label>
-      <textarea id="answer" placeholder="Type the answer here..."></textarea>
-      <button id="save-flashcard-btn">Save Flashcard</button>
+  <!-- Deck Modal -->
+  <div class="modal" id="deck-modal">
+    <div class="modal-content">
+      <h2>Create New Deck</h2>
+      <form onsubmit="saveDeck(event)">
+        <div class="form-group">
+          <label for="deck-name">Deck Name</label>
+          <input type="text" id="deck-name" placeholder="e.g., Spanish Vocabulary" required>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="save-btn">Create Deck</button>
+          <button type="button" class="cancel-btn" onclick="closeDeckModal()">Cancel</button>
+        </div>
+      </form>
     </div>
-  </main>
+  </div>
+
+  <!-- Card Modal -->
+  <div class="modal" id="card-modal">
+    <div class="modal-content">
+      <h2 id="card-modal-title">Add Flashcard</h2>
+      <form onsubmit="saveCard(event)">
+        <div class="form-group">
+          <label for="card-question">Question</label>
+          <textarea id="card-question" placeholder="What do you want to remember?" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="card-answer">Answer</label>
+          <textarea id="card-answer" placeholder="The answer..." required></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="save-btn">Save Card</button>
+          <button type="button" class="cancel-btn" onclick="closeCardModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
-    // Get the current logged-in user
-const currentUser = localStorage.getItem("loggedInUser");
-if (!currentUser) {
-  window.location.href = "login.html"; // Redirect if no user is logged in
-}
+    let currentUser = null;
+    let currentDeck = null;
+    let currentDecks = [];
+    let editingCardId = null;
+    let studyCards = [];
+    let currentStudyIndex = 0;
 
-// Get user-specific decks
-let decks = JSON.parse(localStorage.getItem(`decks_${currentUser}`)) || {};
-let currentDeck = null;
+    async function init() {
+      currentUser = await db.getCurrentUser();
+      if (!currentUser) {
+        window.location.href = 'signin.html';
+        return;
+      }
+      await loadDecks();
+    }
 
-// Elements
-const deckList = document.getElementById("deck-list");
-const flashcardSection = document.getElementById("flashcard-section");
-const addDeckBtn = document.getElementById("add-deck-btn");
-const saveDeckBtn = document.getElementById("save-deck-btn");
-const deckNameInput = document.getElementById("deck-name");
-const backToDecksBtn = document.getElementById("back-to-decks-btn");
-const deckTitle = document.getElementById("deck-title");
-const addFlashcardBtn = document.getElementById("add-flashcard-btn");
-const saveFlashcardBtn = document.getElementById("save-flashcard-btn");
-const questionInput = document.getElementById("question");
-const answerInput = document.getElementById("answer");
-const flashcardList = document.getElementById("flashcard-list");
+    async function loadDecks() {
+      const { data, error } = await db.getDecks(currentUser.id);
+      
+      if (error) {
+        console.error('Error loading decks:', error);
+        return;
+      }
 
-// Update Deck List
-function updateDeckList() {
-  deckList.innerHTML = "";
-  Object.keys(decks).forEach((deckName) => {
-    const deckDiv = document.createElement("div");
-    deckDiv.classList.add("card");
-    deckDiv.innerHTML = `
-      <p>${deckName}</p>
-      <button onclick="openDeck('${deckName}')">Open</button>
-      <button onclick="deleteDeck('${deckName}')">Delete</button>
-    `;
-    deckList.appendChild(deckDiv);
-  });
-}
+      currentDecks = data || [];
+      renderDecks();
+    }
 
-// Open a Deck
-function openDeck(deckName) {
-  currentDeck = deckName;
-  deckTitle.textContent = `Deck: ${deckName}`;
-  flashcardSection.classList.remove("hide");
-  document.querySelector(".deck-container").classList.add("hide");
-  loadFlashcards();
-}
+    function renderDecks() {
+      const deckList = document.getElementById('deck-list');
+      
+      if (currentDecks.length === 0) {
+        deckList.innerHTML = `
+          <div class="empty-state" style="grid-column: 1/-1;">
+            <i class="fas fa-layer-group"></i>
+            <h3>No decks yet</h3>
+            <p>Create your first deck to start studying!</p>
+          </div>
+        `;
+        return;
+      }
 
-// Delete a Deck
-function deleteDeck(deckName) {
-  delete decks[deckName];
-  saveDecks();
-  updateDeckList();
-}
+      deckList.innerHTML = currentDecks.map(deck => {
+        const cardCount = deck.flashcards?.length || 0;
+        const progress = Math.min(100, (cardCount / 20) * 100);
+        
+        return `
+          <div class="deck-card">
+            <div class="deck-card-content">
+              <div class="deck-icon-wrapper">
+                <i class="deck-icon fas fa-layer-group"></i>
+              </div>
+              <h3>${deck.name}</h3>
+              <div class="deck-meta">
+                <div class="deck-meta-item">
+                  <i class="fas fa-clone"></i>
+                  <span>${cardCount} cards</span>
+                </div>
+                <div class="deck-meta-item">
+                  <i class="fas fa-clock"></i>
+                  <span>${formatDate(deck.created_at)}</span>
+                </div>
+              </div>
+              <div class="deck-progress">
+                <div class="progress-label">
+                  <span>Progress</span>
+                  <span>${Math.round(progress)}%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: ${progress}%"></div>
+                </div>
+              </div>
+              <div class="deck-actions">
+                <button class="deck-btn open-btn" onclick="openDeck('${deck.id}')">
+                  <i class="fas fa-folder-open"></i> Open Deck
+                </button>
+                <button class="deck-btn delete-btn" onclick="deleteDeck('${deck.id}')">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
 
-// Add a Deck
-addDeckBtn.addEventListener("click", () => {
-  document.getElementById("add-deck-modal").classList.remove("hide");
-});
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diff = now - date;
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      
+      if (days === 0) return 'Today';
+      if (days === 1) return 'Yesterday';
+      if (days < 7) return `${days} days ago`;
+      return date.toLocaleDateString();
+    }
 
-saveDeckBtn.addEventListener("click", () => {
-  const deckName = deckNameInput.value.trim();
-  if (deckName && !decks[deckName]) {
-    decks[deckName] = [];
-    saveDecks();
-    updateDeckList();
-    document.getElementById("add-deck-modal").classList.add("hide");
-    deckNameInput.value = "";
-  }
-});
+    async function openDeck(deckId) {
+      currentDeck = currentDecks.find(d => d.id === deckId);
+      if (!currentDeck) return;
 
-// Back to Decks
-backToDecksBtn.addEventListener("click", () => {
-  flashcardSection.classList.add("hide");
-  document.querySelector(".deck-container").classList.remove("hide");
-  currentDeck = null;
-});
+      document.getElementById('deck-title').innerHTML = `<i class="fas fa-layer-group"></i> ${currentDeck.name}`;
+      document.getElementById('card-count').textContent = `${currentDeck.flashcards?.length || 0} cards`;
+      document.getElementById('deck-date').textContent = formatDate(currentDeck.created_at);
+      
+      document.getElementById('deck-view').classList.add('hidden');
+      document.getElementById('flashcard-view').classList.add('active');
+      
+      renderFlashcards();
+    }
 
-// Add Flashcard Button Click
-addFlashcardBtn.addEventListener("click", () => {
-  document.getElementById("add-flashcard-modal").classList.remove("hide");
-});
+    function renderFlashcards() {
+      const flashcardList = document.getElementById('flashcard-list');
+      const cards = currentDeck.flashcards || [];
 
-saveFlashcardBtn.addEventListener("click", () => {
-  const question = questionInput.value.trim();
-  const answer = answerInput.value.trim();
-  if (question && answer && currentDeck) {
-    decks[currentDeck].push({ question, answer });
-    saveDecks();
-    loadFlashcards();
-    document.getElementById("add-flashcard-modal").classList.add("hide");
-    questionInput.value = "";
-    answerInput.value = "";
-  }
-});
+      if (cards.length === 0) {
+        flashcardList.innerHTML = `
+          <div class="empty-state" style="grid-column: 1/-1;">
+            <i class="fas fa-clone"></i>
+            <h3>No flashcards yet</h3>
+            <p>Add your first flashcard to start studying!</p>
+          </div>
+        `;
+        return;
+      }
 
-// Load Flashcards for Current Deck
-function loadFlashcards() {
-  flashcardList.innerHTML = "";
-  if (!currentDeck) return;
+      flashcardList.innerHTML = cards.map((card, index) => `
+        <div class="flashcard">
+          <div class="flashcard-number">${index + 1}</div>
+          <div class="question">${card.question}</div>
+          <div class="answer-wrapper">
+            <a href="#" class="show-answer-btn" onclick="toggleAnswer(event, ${index})">
+              <i class="fas fa-eye"></i> Show Answer
+            </a>
+            <div class="answer" id="answer-${index}">${card.answer}</div>
+          </div>
+          <div class="card-actions">
+            <button class="card-btn edit-btn" onclick="editCard('${card.id}')">
+              <i class="fas fa-edit"></i> Edit
+            </button>
+            <button class="card-btn delete-card-btn" onclick="deleteCard('${card.id}')">
+              <i class="fas fa-trash"></i> Delete
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
 
-  const flashcards = decks[currentDeck];
-  flashcards.forEach((card, index) => {
-    const cardDiv = document.createElement("div");
-    cardDiv.classList.add("card");
-
-    // Question
-    cardDiv.innerHTML += `<p class="question-div">${card.question}</p>`;
-
-    // Answer (hidden by default)
-    const displayAnswer = document.createElement("p");
-    displayAnswer.classList.add("answer-div", "hide");
-    displayAnswer.innerText = card.answer;
-
-    // Show/Hide Button
-    const toggleAnswerBtn = document.createElement("a");
-    toggleAnswerBtn.setAttribute("href", "#");
-    toggleAnswerBtn.setAttribute("class", "show-hide-btn");
-    toggleAnswerBtn.innerText = "Show/Hide Answer";
-    toggleAnswerBtn.addEventListener("click", (e) => {
+    function toggleAnswer(e, index) {
       e.preventDefault();
-      displayAnswer.classList.toggle("hide");
+      const answerEl = document.getElementById(`answer-${index}`);
+      const btn = e.currentTarget;
+      
+      answerEl.classList.toggle('show');
+      
+      if (answerEl.classList.contains('show')) {
+        btn.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Answer';
+      } else {
+        btn.innerHTML = '<i class="fas fa-eye"></i> Show Answer';
+      }
+    }
+
+    function showDeckView() {
+      document.getElementById('flashcard-view').classList.remove('active');
+      document.getElementById('deck-view').classList.remove('hidden');
+      currentDeck = null;
+    }
+
+    // Study Mode Functions
+    function startStudyMode() {
+      if (!currentDeck || !currentDeck.flashcards || currentDeck.flashcards.length === 0) {
+        alert('Add some flashcards first!');
+        return;
+      }
+
+      studyCards = [...currentDeck.flashcards].sort(() => Math.random() - 0.5);
+      currentStudyIndex = 0;
+      document.getElementById('study-mode').classList.add('active');
+      loadStudyCard();
+    }
+
+    function loadStudyCard() {
+      const card = studyCards[currentStudyIndex];
+      document.getElementById('study-question').textContent = card.question;
+      document.getElementById('study-answer').textContent = card.answer;
+      document.getElementById('study-progress-text').textContent = 
+        `Card ${currentStudyIndex + 1} of ${studyCards.length}`;
+      document.getElementById('study-card').classList.remove('flipped');
+    }
+
+    function flipCard() {
+      document.getElementById('study-card').classList.toggle('flipped');
+    }
+
+    function nextCard() {
+      if (currentStudyIndex < studyCards.length - 1) {
+        currentStudyIndex++;
+        loadStudyCard();
+      } else {
+        alert('You\'ve completed all cards! 🎉');
+        exitStudyMode();
+      }
+    }
+
+    function previousCard() {
+      if (currentStudyIndex > 0) {
+        currentStudyIndex--;
+        loadStudyCard();
+      }
+    }
+
+    function exitStudyMode() {
+      document.getElementById('study-mode').classList.remove('active');
+    }
+
+    // Modal functions
+    function openDeckModal() {
+      document.getElementById('deck-modal').classList.add('active');
+    }
+
+    function closeDeckModal() {
+      document.getElementById('deck-modal').classList.remove('active');
+      document.getElementById('deck-name').value = '';
+    }
+
+    function openCardModal() {
+      editingCardId = null;
+      document.getElementById('card-modal-title').textContent = 'Add Flashcard';
+      document.getElementById('card-modal').classList.add('active');
+    }
+
+    function closeCardModal() {
+      document.getElementById('card-modal').classList.remove('active');
+      document.getElementById('card-question').value = '';
+      document.getElementById('card-answer').value = '';
+      editingCardId = null;
+    }
+
+    async function saveDeck(e) {
+      e.preventDefault();
+      const name = document.getElementById('deck-name').value.trim();
+      
+      const { data, error } = await db.createDeck(currentUser.id, name);
+      
+      if (error) {
+        alert('Error creating deck: ' + error.message);
+        return;
+      }
+
+      closeDeckModal();
+      await loadDecks();
+    }
+
+    async function deleteDeck(deckId) {
+      if (!confirm('Delete this deck and all its cards?')) return;
+      
+      const { error } = await db.deleteDeck(deckId);
+      
+      if (error) {
+        alert('Error deleting deck: ' + error.message);
+        return;
+      }
+
+      await loadDecks();
+    }
+
+    async function saveCard(e) {
+      e.preventDefault();
+      const question = document.getElementById('card-question').value.trim();
+      const answer = document.getElementById('card-answer').value.trim();
+
+      if (editingCardId) {
+        const { error } = await db.updateFlashcard(editingCardId, question, answer);
+        if (error) {
+          alert('Error updating card: ' + error.message);
+          return;
+        }
+      } else {
+        const { error } = await db.createFlashcard(currentDeck.id, question, answer);
+        if (error) {
+          alert('Error creating card: ' + error.message);
+          return;
+        }
+      }
+
+      closeCardModal();
+      await loadDecks();
+      await openDeck(currentDeck.id);
+    }
+
+    async function editCard(cardId) {
+      const card = currentDeck.flashcards.find(c => c.id === cardId);
+      if (!card) return;
+
+      editingCardId = cardId;
+      document.getElementById('card-modal-title').textContent = 'Edit Flashcard';
+      document.getElementById('card-question').value = card.question;
+      document.getElementById('card-answer').value = card.answer;
+      document.getElementById('card-modal').classList.add('active');
+    }
+
+    async function deleteCard(cardId) {
+      if (!confirm('Delete this flashcard?')) return;
+      
+      const { error } = await db.deleteFlashcard(cardId);
+      
+      if (error) {
+        alert('Error deleting card: ' + error.message);
+        return;
+      }
+
+      await loadDecks();
+      await openDeck(currentDeck.id);
+    }
+
+    // Close modals when clicking outside
+    window.addEventListener('click', (e) => {
+      if (e.target.classList.contains('modal')) {
+        closeDeckModal();
+        closeCardModal();
+      }
     });
 
-    cardDiv.appendChild(toggleAnswerBtn);
-    cardDiv.appendChild(displayAnswer);
-
-    // Edit/Delete Buttons
-    const buttonsCon = document.createElement("div");
-    buttonsCon.classList.add("buttons-con");
-
-    const editButton = document.createElement("button");
-    editButton.classList.add("edit");
-    editButton.innerHTML = `<i class="fa-solid fa-pen-to-square"></i>`;
-    editButton.addEventListener("click", () => {
-      editFlashcard(index);
-    });
-    buttonsCon.appendChild(editButton);
-
-    const deleteButton = document.createElement("button");
-    deleteButton.classList.add("delete");
-    deleteButton.innerHTML = `<i class="fa-solid fa-trash-can"></i>`;
-    deleteButton.addEventListener("click", () => {
-      deleteFlashcard(index);
-    });
-    buttonsCon.appendChild(deleteButton);
-
-    cardDiv.appendChild(buttonsCon);
-    flashcardList.appendChild(cardDiv);
-  });
-}
-
-// Edit Flashcard
-function editFlashcard(index) {
-  const flashcard = decks[currentDeck][index];
-  questionInput.value = flashcard.question;
-  answerInput.value = flashcard.answer;
-  decks[currentDeck].splice(index, 1); // Temporarily remove for editing
-  saveDecks();
-  document.getElementById("add-flashcard-modal").classList.remove("hide");
-}
-
-// Delete Flashcard
-function deleteFlashcard(index) {
-  decks[currentDeck].splice(index, 1);
-  saveDecks();
-  loadFlashcards();
-}
-
-// Save Decks to LocalStorage
-function saveDecks() {
-  localStorage.setItem(`decks_${currentUser}`, JSON.stringify(decks));
-}
-
-// Initialize Deck List on Page Load
-document.addEventListener("DOMContentLoaded", () => {
-  updateDeckList();
-});
-
+    window.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
 </html>

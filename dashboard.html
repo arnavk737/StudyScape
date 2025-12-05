@@ -3,166 +3,540 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard</title>
+  <title>Dashboard - StudyScape</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link rel="stylesheet" href="style.css">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
   <style>
-    /* Navbar Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+      min-height: 100vh;
+    }
+
+    /* Navbar */
     .navbar {
+      background: white;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+      padding: 1rem 2rem;
       display: flex;
-      justify-content: flex-start;
       align-items: center;
-      padding: 10px 20px;
-      background-color: #0073e6;
+      gap: 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      animation: slideDown 0.4s ease;
+    }
+
+    @keyframes slideDown {
+      from { transform: translateY(-100%); }
+      to { transform: translateY(0); }
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 1rem;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 50px;
       color: white;
-      position: relative;
-    }
-
-    .navbar .profile {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-right: 30px;
-      position: relative;
       cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
     }
 
-    .navbar .profile i {
-      font-size: 20px;
+    .profile:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
     }
 
-    .navbar .profile .username {
-      font-size: 16px;
+    .profile i {
+      font-size: 1.2rem;
+    }
+
+    .username {
       font-weight: 600;
     }
 
-    .dropdown-menu {
+    .dropdown {
       display: none;
       position: absolute;
       top: 100%;
-      left: 0;
-      background-color: white;
-      color: black;
-      border-radius: 5px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      min-width: 150px;
-      z-index: 10;
+      right: 0;
+      margin-top: 0.5rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+      min-width: 200px;
+      overflow: hidden;
+      animation: dropdownSlide 0.3s ease;
     }
 
-    .dropdown-menu a {
+    @keyframes dropdownSlide {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .dropdown.show {
       display: block;
-      padding: 10px;
-      text-decoration: none;
-      color: black;
-      font-size: 14px;
     }
 
-    .dropdown-menu a:hover {
-      background-color: #f1f1f1;
-    }
-
-    .show {
-      display: block;
-    }
-
-    .navbar .nav-links {
+    .dropdown a {
       display: flex;
-      gap: 15px;
-    }
-
-    .navbar .nav-links a {
-      color: white;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 1.25rem;
+      color: #334155;
       text-decoration: none;
-      font-size: 16px;
-      font-weight: 500;
-      padding: 8px 12px;
-      border-radius: 5px;
-      transition: background-color 0.3s, color 0.3s;
+      transition: all 0.2s;
     }
 
-    .navbar .nav-links a:hover {
-      background-color: #005bb5;
-      color: #eaf4fc;
+    .dropdown a:hover {
+      background: #f8fafc;
+      color: #667eea;
     }
 
-    .time {
+    .nav-links {
+      display: flex;
+      gap: 0.5rem;
       margin-left: auto;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      padding: 0.625rem 1.25rem;
+      background: #f8fafc;
+      color: #64748b;
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      font-size: 0.95rem;
+    }
+
+    .nav-links a:hover {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
     }
 
     /* Main Content */
-    .main-content {
-      padding: 20px;
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
     }
 
-    /* Responsive Navbar */
-    @media screen and (max-width: 768px) {
-      .navbar .nav-links {
-        flex-wrap: wrap;
-        justify-content: flex-start;
+    .welcome {
+      margin-bottom: 2.5rem;
+      animation: fadeInUp 0.6s ease;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .welcome h1 {
+      font-size: 2.5rem;
+      color: #1e293b;
+      margin-bottom: 0.5rem;
+    }
+
+    .welcome p {
+      color: #64748b;
+      font-size: 1.1rem;
+    }
+
+    /* Stats Cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 1.75rem;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      transition: all 0.3s ease;
+      animation: fadeInUp 0.6s ease backwards;
+    }
+
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .stat-card:nth-child(3) { animation-delay: 0.3s; }
+    .stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    }
+
+    .stat-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .stat-card:nth-child(1) .stat-icon {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+    }
+
+    .stat-card:nth-child(2) .stat-icon {
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      color: white;
+    }
+
+    .stat-card:nth-child(3) .stat-icon {
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
+      color: white;
+    }
+
+    .stat-card:nth-child(4) .stat-icon {
+      background: linear-gradient(135deg, #43e97b, #38f9d7);
+      color: white;
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+      color: #64748b;
+      font-size: 0.95rem;
+    }
+
+    /* Content Sections */
+    .content-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 2rem;
+    }
+
+    .section-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      animation: fadeInUp 0.6s ease backwards;
+      animation-delay: 0.5s;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-header h2 {
+      font-size: 1.5rem;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .section-header i {
+      color: #667eea;
+    }
+
+    .view-all {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.3s;
+    }
+
+    .view-all:hover {
+      color: #764ba2;
+      transform: translateX(5px);
+    }
+
+    .item-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .item {
+      padding: 1rem;
+      background: #f8fafc;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .item:hover {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+      transform: translateX(5px);
+    }
+
+    .item-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+
+    .item-content {
+      flex: 1;
+    }
+
+    .item-title {
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 0.25rem;
+    }
+
+    .item-meta {
+      font-size: 0.85rem;
+      color: #64748b;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 2rem;
+      color: #94a3b8;
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 1rem;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .welcome h1 {
+        font-size: 2rem;
+      }
+
+      .content-grid {
+        grid-template-columns: 1fr;
       }
     }
   </style>
-  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 <body>
-  <!-- Navbar -->
-  <header class="navbar">
+  <nav class="navbar">
+    <div class="logo">StudyScape ✨</div>
+    
     <div class="profile" id="profile-dropdown">
       <i class="fas fa-user-circle"></i>
-      <span class="username" id="user-name"></span>
-      <div class="dropdown-menu" id="dropdown-menu">
-        <a href="settings.html">Settings</a>
-        <a href="#" onclick="logout()">Logout</a>
+      <span class="username" id="username"></span>
+      <div class="dropdown" id="dropdown">
+        <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+        <a href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
       </div>
     </div>
-    <nav class="nav-links">
-      <a href="flashcards.html">Flashcards</a>
-      <a href="quizzes.html">Quizzes</a>
-      <a href="notes.html">Notes</a>
-      <a href="schedule.html">Schedule</a>
-      <a href="timer.html">Timer</a>
-      <a href="tools.html">Tools</a>
-    </nav>
-    <nav class="time">
-      <iframe src="https://free.timeanddate.com/clock/i9rkh6po/n833/fcfff/tct/pct/ftb/ts1" frameborder="0" width="76" height="18" allowtransparency="true"></iframe>
-    </nav>
-  </header>
 
-  <!-- Main Content -->
-  <main class="main-content" id="main-content">
-    <p>Select an option from the menu to get started.</p>
-  </main>
+    <div class="nav-links">
+      <a href="flashcards.html"><i class="fas fa-layer-group"></i> Flashcards</a>
+      <a href="notes.html"><i class="fas fa-book"></i> Notes</a>
+      <a href="quizzes.html"><i class="fas fa-question-circle"></i> Quizzes</a>
+      <a href="schedule.html"><i class="fas fa-calendar"></i> Schedule</a>
+      <a href="timer.html"><i class="fas fa-clock"></i> Timer</a>
+      <a href="tools.html"><i class="fas fa-calculator"></i> Tools</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="welcome">
+      <h1>Welcome back, <span id="welcome-username"></span>! 👋</h1>
+      <p>Let's continue your learning journey</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-layer-group"></i></div>
+        <div class="stat-number" id="deck-count">0</div>
+        <div class="stat-label">Flashcard Decks</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-clone"></i></div>
+        <div class="stat-number" id="card-count">0</div>
+        <div class="stat-label">Total Flashcards</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-book"></i></div>
+        <div class="stat-number" id="notebook-count">0</div>
+        <div class="stat-label">Notebooks</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-fire"></i></div>
+        <div class="stat-number">7</div>
+        <div class="stat-label">Day Streak</div>
+      </div>
+    </div>
+
+    <div class="content-grid">
+      <div class="section-card">
+        <div class="section-header">
+          <h2><i class="fas fa-layer-group"></i> Recent Decks</h2>
+          <a href="flashcards.html" class="view-all">View All →</a>
+        </div>
+        <div class="item-list" id="recent-decks"></div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-header">
+          <h2><i class="fas fa-book"></i> Recent Notebooks</h2>
+          <a href="notes.html" class="view-all">View All →</a>
+        </div>
+        <div class="item-list" id="recent-notebooks"></div>
+      </div>
+    </div>
+  </div>
 
   <script>
-    // Display username in navbar
-    const user = localStorage.getItem("loggedInUser");
-    if (!user) {
-      window.location.href = "login.html";
-    }
-    document.getElementById("user-name").textContent = user;
+    let currentUser = null;
 
-    // Profile dropdown functionality
-    const profileDropdown = document.getElementById("profile-dropdown");
-    const dropdownMenu = document.getElementById("dropdown-menu");
-    
-    profileDropdown.addEventListener("click", () => {
-      dropdownMenu.classList.toggle("show");
+    // Profile dropdown
+    document.getElementById('profile-dropdown').addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.getElementById('dropdown').classList.toggle('show');
     });
-    
-    window.addEventListener("click", (event) => {
-      if (!profileDropdown.contains(event.target)) {
-        dropdownMenu.classList.remove("show");
+
+    document.addEventListener('click', () => {
+      document.getElementById('dropdown').classList.remove('show');
+    });
+
+    async function handleLogout() {
+      await db.signOut();
+      window.location.href = 'signin.html';
+    }
+
+    async function loadDashboard() {
+      currentUser = await db.getCurrentUser();
+      
+      if (!currentUser) {
+        window.location.href = 'signin.html';
+        return;
       }
-    });
 
-    // Logout functionality
-    function logout() {
-      document.cookie = "authToken=; path=/; max-age=0";
-      document.cookie = "savedEmail=; path=/; max-age=0";
-      sessionStorage.removeItem("loggedInUser");
-      window.location.href = "index.html";
+      // Set username
+      const username = currentUser.user_metadata?.username || currentUser.email.split('@')[0];
+      document.getElementById('username').textContent = username;
+      document.getElementById('welcome-username').textContent = username;
+
+      // Load decks
+      const { data: decks, error: decksError } = await db.getDecks(currentUser.id);
+      
+      if (!decksError && decks) {
+        document.getElementById('deck-count').textContent = decks.length;
+        
+        const totalCards = decks.reduce((sum, deck) => sum + (deck.flashcards?.length || 0), 0);
+        document.getElementById('card-count').textContent = totalCards;
+
+        const recentDecksEl = document.getElementById('recent-decks');
+        if (decks.length === 0) {
+          recentDecksEl.innerHTML = `
+            <div class="empty-state">
+              <i class="fas fa-layer-group"></i>
+              <p>No decks yet. Create your first deck!</p>
+            </div>
+          `;
+        } else {
+          recentDecksEl.innerHTML = decks.slice(0, 5).map(deck => `
+            <div class="item" onclick="window.location.href='flashcards.html'">
+              <div class="item-icon"><i class="fas fa-layer-group"></i></div>
+              <div class="item-content">
+                <div class="item-title">${deck.name}</div>
+                <div class="item-meta">${deck.flashcards?.length || 0} cards</div>
+              </div>
+            </div>
+          `).join('');
+        }
+      }
+
+      // Load notebooks
+      const { data: notebooks, error: notebooksError } = await db.getNotebooks(currentUser.id);
+      
+      if (!notebooksError && notebooks) {
+        document.getElementById('notebook-count').textContent = notebooks.length;
+
+        const recentNotebooksEl = document.getElementById('recent-notebooks');
+        if (notebooks.length === 0) {
+          recentNotebooksEl.innerHTML = `
+            <div class="empty-state">
+              <i class="fas fa-book"></i>
+              <p>No notebooks yet. Create your first notebook!</p>
+            </div>
+          `;
+        } else {
+          recentNotebooksEl.innerHTML = notebooks.slice(0, 5).map(notebook => `
+            <div class="item" onclick="window.location.href='notes.html'">
+              <div class="item-icon"><i class="fas fa-book"></i></div>
+              <div class="item-content">
+                <div class="item-title">${notebook.name}</div>
+                <div class="item-meta">${notebook.type} • ${notebook.pages?.length || 0} pages</div>
+              </div>
+            </div>
+          `).join('');
+        }
+      }
     }
+
+    window.addEventListener('DOMContentLoaded', loadDashboard);
   </script>
 </body>
 </html>
