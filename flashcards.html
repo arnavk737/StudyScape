@@ -559,11 +559,18 @@
       justify-content: center;
     }
 
+    .study-card-container {
+      position: relative;
+      max-width: 700px;
+      width: 100%;
+      min-height: 400px;
+      perspective: 1000px;
+    }
+
     .study-card {
       background: white;
       border-radius: 30px;
       padding: 4rem;
-      max-width: 700px;
       width: 100%;
       min-height: 400px;
       box-shadow: 0 30px 80px rgba(0,0,0,0.3);
@@ -575,6 +582,58 @@
 
     .study-card.flipped {
       transform: rotateY(180deg);
+    }
+
+    .study-card.slide-out-left {
+      animation: slideOutLeft 0.4s ease forwards;
+    }
+
+    .study-card.slide-out-right {
+      animation: slideOutRight 0.4s ease forwards;
+    }
+
+    .study-card.slide-in-left {
+      animation: slideInLeft 0.4s ease forwards;
+    }
+
+    .study-card.slide-in-right {
+      animation: slideInRight 0.4s ease forwards;
+    }
+
+    @keyframes slideOutLeft {
+      to {
+        transform: translateX(-120%) rotateZ(-10deg);
+        opacity: 0;
+      }
+    }
+
+    @keyframes slideOutRight {
+      to {
+        transform: translateX(120%) rotateZ(10deg);
+        opacity: 0;
+      }
+    }
+
+    @keyframes slideInLeft {
+      from {
+        transform: translateX(-120%) rotateZ(-10deg);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0) rotateZ(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideInRight {
+      from {
+        transform: translateX(120%) rotateZ(10deg);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0) rotateZ(0);
+        opacity: 1;
+      }
     }
 
     .study-card-front,
@@ -612,6 +671,8 @@
       display: flex;
       gap: 1rem;
       margin-top: 2rem;
+      flex-wrap: wrap;
+      justify-content: center;
     }
 
     .study-control-btn {
@@ -623,11 +684,52 @@
       font-weight: 600;
       cursor: pointer;
       transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
     .study-control-btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+
+    .study-control-btn.shuffle-btn {
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      color: white;
+    }
+
+    .study-hint {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,0.8);
+      font-size: 0.9rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .key-hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255,255,255,0.1);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      backdrop-filter: blur(10px);
+    }
+
+    .key-badge {
+      background: rgba(255,255,255,0.9);
+      color: #667eea;
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
     /* Modal */
@@ -835,6 +937,9 @@
           <button class="header-btn add-card-btn" onclick="openCardModal()">
             <i class="fas fa-plus"></i> Add Card
           </button>
+          <button class="header-btn" style="background: linear-gradient(135deg, #43e97b, #38f9d7); color: white; box-shadow: 0 4px 15px rgba(67, 233, 123, 0.3);" onclick="openImportModal()">
+            <i class="fas fa-file-import"></i> Import
+          </button>
           <button class="header-btn back-to-decks-btn" onclick="showDeckView()">
             <i class="fas fa-arrow-left"></i> Back
           </button>
@@ -852,17 +957,41 @@
         <i class="fas fa-times"></i> Exit
       </button>
     </div>
-    <div class="study-card" id="study-card" onclick="flipCard()">
-      <div class="study-card-front">
-        <h2 style="text-align: center; font-size: 1.75rem; color: #1e293b;" id="study-question">Click to reveal answer</h2>
+    <div class="study-card-container">
+      <div class="study-card" id="study-card" onclick="flipCard()">
+        <div class="study-card-front">
+          <h2 style="text-align: center; font-size: 1.75rem; color: #1e293b;" id="study-question">Click to reveal answer</h2>
+        </div>
+        <div class="study-card-back">
+          <h3 style="text-align: center; font-size: 1.5rem; color: #64748b;" id="study-answer">Answer</h3>
+        </div>
       </div>
-      <div class="study-card-back">
-        <h3 style="text-align: center; font-size: 1.5rem; color: #64748b;" id="study-answer">Answer</h3>
+    </div>
+    <div class="study-hint">
+      <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+        <div class="key-hint">
+          <span class="key-badge">SPACE</span>
+          <span>Flip card</span>
+        </div>
+        <div class="key-hint">
+          <span class="key-badge">←</span>
+          <span>Previous</span>
+        </div>
+        <div class="key-hint">
+          <span class="key-badge">→</span>
+          <span>Next</span>
+        </div>
+      </div>
+      <div style="opacity: 0.7; margin-top: 0.5rem;">
+        <i class="fas fa-hand-pointer"></i> Or click card to flip
       </div>
     </div>
     <div class="study-controls">
       <button class="study-control-btn" onclick="previousCard()">
         <i class="fas fa-arrow-left"></i> Previous
+      </button>
+      <button class="study-control-btn shuffle-btn" onclick="shuffleCards()">
+        <i class="fas fa-random"></i> Shuffle
       </button>
       <button class="study-control-btn" onclick="nextCard()">
         Next <i class="fas fa-arrow-right"></i>
@@ -905,6 +1034,66 @@
           <button type="button" class="cancel-btn" onclick="closeCardModal()">Cancel</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Import Modal -->
+  <div class="modal" id="import-modal">
+    <div class="modal-content" style="max-width: 650px;">
+      <h2>Import Flashcards</h2>
+      <p style="color: #64748b; margin-bottom: 1.5rem;">Choose your import format:</p>
+      
+      <div class="tabs" style="margin-bottom: 1.5rem;">
+        <button class="tab active" onclick="switchImportTab('text')">Text Format</button>
+        <button class="tab" onclick="switchImportTab('csv')">CSV File</button>
+        <button class="tab" onclick="switchImportTab('quizlet')">Quizlet URL</button>
+      </div>
+
+      <!-- Text Import -->
+      <div id="import-text" class="import-format active">
+        <div class="form-group">
+          <label for="import-text-input">Paste your flashcards</label>
+          <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 0.5rem;">
+            Format: One card per line, question and answer separated by | or tab
+          </p>
+          <textarea id="import-text-input" placeholder="What is 2+2? | 4&#10;Capital of France? | Paris&#10;H2O | Water" style="min-height: 200px; font-family: monospace;"></textarea>
+          <p style="font-size: 0.85rem; color: #64748b; margin-top: 0.5rem;">
+            <i class="fas fa-info-circle"></i> You can use: <code>|</code> or <code>tab</code> or <code>:</code> as separator
+          </p>
+        </div>
+      </div>
+
+      <!-- CSV Import -->
+      <div id="import-csv" class="import-format" style="display: none;">
+        <div class="form-group">
+          <label for="csv-file">Upload CSV file</label>
+          <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 0.5rem;">
+            Format: question,answer (one card per line)
+          </p>
+          <input type="file" id="csv-file" accept=".csv,.txt" style="padding: 1rem; border: 2px dashed #e2e8f0; border-radius: 12px; width: 100%; cursor: pointer;">
+          <p style="font-size: 0.85rem; color: #64748b; margin-top: 0.5rem;">
+            <i class="fas fa-info-circle"></i> Example: question,answer or "question","answer"
+          </p>
+        </div>
+      </div>
+
+      <!-- Quizlet Import -->
+      <div id="import-quizlet" class="import-format" style="display: none;">
+        <div class="form-group">
+          <label for="quizlet-url">Quizlet Set URL or ID</label>
+          <input type="text" id="quizlet-url" placeholder="https://quizlet.com/123456789/set-name or just 123456789">
+          <p style="font-size: 0.85rem; color: #64748b; margin-top: 0.5rem;">
+            <i class="fas fa-lightbulb"></i> Copy flashcards from Quizlet, then paste in Text Format tab
+          </p>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="save-btn" onclick="processImport()">
+          <i class="fas fa-file-import"></i> Import Cards
+        </button>
+        <button type="button" class="cancel-btn" onclick="closeImportModal()">Cancel</button>
+      </div>
     </div>
   </div>
 
@@ -1093,11 +1282,15 @@
 
     function loadStudyCard() {
       const card = studyCards[currentStudyIndex];
+      const cardEl = document.getElementById('study-card');
+      
+      // Remove flip if card was flipped
+      cardEl.classList.remove('flipped');
+      
       document.getElementById('study-question').textContent = card.question;
       document.getElementById('study-answer').textContent = card.answer;
       document.getElementById('study-progress-text').textContent = 
         `Card ${currentStudyIndex + 1} of ${studyCards.length}`;
-      document.getElementById('study-card').classList.remove('flipped');
     }
 
     function flipCard() {
@@ -1105,24 +1298,110 @@
     }
 
     function nextCard() {
-      if (currentStudyIndex < studyCards.length - 1) {
-        currentStudyIndex++;
+      const cardEl = document.getElementById('study-card');
+      
+      // Animate out
+      cardEl.classList.add('slide-out-left');
+      
+      setTimeout(() => {
+        // Move to next card (loop back to start if at end)
+        currentStudyIndex = (currentStudyIndex + 1) % studyCards.length;
         loadStudyCard();
-      } else {
-        alert('You\'ve completed all cards! 🎉');
-        exitStudyMode();
-      }
+        
+        // Animate in
+        cardEl.classList.remove('slide-out-left');
+        cardEl.classList.add('slide-in-right');
+        
+        setTimeout(() => {
+          cardEl.classList.remove('slide-in-right');
+        }, 400);
+      }, 400);
     }
 
     function previousCard() {
-      if (currentStudyIndex > 0) {
-        currentStudyIndex--;
+      const cardEl = document.getElementById('study-card');
+      
+      // Animate out
+      cardEl.classList.add('slide-out-right');
+      
+      setTimeout(() => {
+        // Move to previous card (loop to end if at start)
+        currentStudyIndex = (currentStudyIndex - 1 + studyCards.length) % studyCards.length;
         loadStudyCard();
-      }
+        
+        // Animate in
+        cardEl.classList.remove('slide-out-right');
+        cardEl.classList.add('slide-in-left');
+        
+        setTimeout(() => {
+          cardEl.classList.remove('slide-in-left');
+        }, 400);
+      }, 400);
+    }
+
+    function shuffleCards() {
+      studyCards = studyCards.sort(() => Math.random() - 0.5);
+      currentStudyIndex = 0;
+      
+      const cardEl = document.getElementById('study-card');
+      cardEl.classList.add('slide-out-right');
+      
+      setTimeout(() => {
+        loadStudyCard();
+        cardEl.classList.remove('slide-out-right');
+        cardEl.classList.add('slide-in-left');
+        
+        setTimeout(() => {
+          cardEl.classList.remove('slide-in-left');
+        }, 400);
+      }, 400);
     }
 
     function exitStudyMode() {
       document.getElementById('study-mode').classList.remove('active');
+      // Remove keyboard listeners
+      document.removeEventListener('keydown', handleStudyKeyPress);
+    }
+
+    // Keyboard navigation for study mode
+    function handleStudyKeyPress(e) {
+      // Only handle if study mode is active
+      if (!document.getElementById('study-mode').classList.contains('active')) return;
+
+      switch(e.key) {
+        case ' ':
+        case 'Spacebar': // For older browsers
+          e.preventDefault(); // Prevent page scroll
+          flipCard();
+          break;
+        case 'ArrowLeft':
+          e.preventDefault();
+          previousCard();
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          nextCard();
+          break;
+        case 'Escape':
+          exitStudyMode();
+          break;
+      }
+    }
+
+    // Add keyboard listener when study mode starts
+    function startStudyMode() {
+      if (!currentDeck || !currentDeck.flashcards || currentDeck.flashcards.length === 0) {
+        alert('Add some flashcards first!');
+        return;
+      }
+
+      studyCards = [...currentDeck.flashcards].sort(() => Math.random() - 0.5);
+      currentStudyIndex = 0;
+      document.getElementById('study-mode').classList.add('active');
+      loadStudyCard();
+      
+      // Add keyboard listener
+      document.addEventListener('keydown', handleStudyKeyPress);
     }
 
     // Modal functions
@@ -1225,11 +1504,144 @@
       await openDeck(currentDeck.id);
     }
 
+    // Import Functions
+    function openImportModal() {
+      document.getElementById('import-modal').classList.add('active');
+    }
+
+    function closeImportModal() {
+      document.getElementById('import-modal').classList.remove('active');
+      document.getElementById('import-text-input').value = '';
+      document.getElementById('csv-file').value = '';
+      document.getElementById('quizlet-url').value = '';
+    }
+
+    function switchImportTab(format) {
+      // Update tabs
+      document.querySelectorAll('#import-modal .tab').forEach(t => t.classList.remove('active'));
+      event.target.classList.add('active');
+
+      // Update formats
+      document.querySelectorAll('.import-format').forEach(f => f.style.display = 'none');
+      document.getElementById(`import-${format}`).style.display = 'block';
+    }
+
+    async function processImport() {
+      const activeFormat = document.querySelector('.import-format[style="display: block;"]') || 
+                          document.querySelector('.import-format.active');
+      
+      if (!activeFormat) return;
+
+      let cards = [];
+
+      if (activeFormat.id === 'import-text') {
+        cards = parseTextImport();
+      } else if (activeFormat.id === 'import-csv') {
+        cards = await parseCSVImport();
+      } else if (activeFormat.id === 'import-quizlet') {
+        alert('Copy cards from Quizlet and paste them in the Text Format tab!');
+        return;
+      }
+
+      if (cards.length === 0) {
+        alert('No cards found! Check your format.');
+        return;
+      }
+
+      if (confirm(`Import ${cards.length} flashcards?`)) {
+        await importCards(cards);
+      }
+    }
+
+    function parseTextImport() {
+      const text = document.getElementById('import-text-input').value.trim();
+      if (!text) return [];
+
+      const lines = text.split('\n').filter(line => line.trim());
+      const cards = [];
+
+      for (const line of lines) {
+        // Try different separators: | tab : ;
+        let question, answer;
+        
+        if (line.includes('|')) {
+          [question, answer] = line.split('|').map(s => s.trim());
+        } else if (line.includes('\t')) {
+          [question, answer] = line.split('\t').map(s => s.trim());
+        } else if (line.includes(':')) {
+          [question, answer] = line.split(':').map(s => s.trim());
+        } else if (line.includes(';')) {
+          [question, answer] = line.split(';').map(s => s.trim());
+        }
+
+        if (question && answer) {
+          cards.push({ question, answer });
+        }
+      }
+
+      return cards;
+    }
+
+    async function parseCSVImport() {
+      const fileInput = document.getElementById('csv-file');
+      if (!fileInput.files || !fileInput.files[0]) {
+        alert('Please select a CSV file!');
+        return [];
+      }
+
+      const file = fileInput.files[0];
+      const text = await file.text();
+      const lines = text.split('\n').filter(line => line.trim());
+      const cards = [];
+
+      for (const line of lines) {
+        // Handle CSV with or without quotes
+        let question, answer;
+        
+        if (line.includes('","')) {
+          [question, answer] = line.replace(/^"|"$/g, '').split('","');
+        } else if (line.includes(',')) {
+          [question, answer] = line.split(',').map(s => s.trim());
+        }
+
+        if (question && answer) {
+          // Remove quotes if present
+          question = question.replace(/^["']|["']$/g, '');
+          answer = answer.replace(/^["']|["']$/g, '');
+          cards.push({ question, answer });
+        }
+      }
+
+      return cards;
+    }
+
+    async function importCards(cards) {
+      const btn = event.target;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Importing...';
+
+      let imported = 0;
+      for (const card of cards) {
+        const { error } = await db.createFlashcard(currentDeck.id, card.question, card.answer);
+        if (!error) imported++;
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-file-import"></i> Import Cards';
+
+      closeImportModal();
+      alert(`✅ Successfully imported ${imported} of ${cards.length} cards!`);
+      
+      await loadDecks();
+      await openDeck(currentDeck.id);
+    }
+
     // Close modals when clicking outside
     window.addEventListener('click', (e) => {
       if (e.target.classList.contains('modal')) {
         closeDeckModal();
         closeCardModal();
+        closeImportModal();
       }
     });
 

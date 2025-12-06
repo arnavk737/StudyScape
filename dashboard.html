@@ -423,7 +423,7 @@
       </div>
       <div class="stat-card">
         <div class="stat-icon"><i class="fas fa-fire"></i></div>
-        <div class="stat-number">7</div>
+        <div class="stat-number" id="streak-count">0</div>
         <div class="stat-label">Day Streak</div>
       </div>
     </div>
@@ -477,6 +477,10 @@
       const username = currentUser.user_metadata?.username || currentUser.email.split('@')[0];
       document.getElementById('username').textContent = username;
       document.getElementById('welcome-username').textContent = username;
+
+      // Calculate streak
+      const streak = calculateStreak();
+      document.getElementById('streak-count').textContent = streak;
 
       // Load decks
       const { data: decks, error: decksError } = await db.getDecks(currentUser.id);
@@ -533,6 +537,41 @@
             </div>
           `).join('');
         }
+      }
+    }
+
+    function calculateStreak() {
+      const lastVisit = localStorage.getItem('lastVisitDate');
+      const today = new Date().toDateString();
+      
+      if (!lastVisit) {
+        // First visit
+        localStorage.setItem('lastVisitDate', today);
+        localStorage.setItem('currentStreak', '1');
+        return 1;
+      }
+
+      const lastDate = new Date(lastVisit);
+      const todayDate = new Date(today);
+      const diffTime = todayDate - lastDate;
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+      let currentStreak = parseInt(localStorage.getItem('currentStreak') || '1');
+
+      if (diffDays === 0) {
+        // Same day, return current streak
+        return currentStreak;
+      } else if (diffDays === 1) {
+        // Next day, increment streak
+        currentStreak++;
+        localStorage.setItem('currentStreak', currentStreak.toString());
+        localStorage.setItem('lastVisitDate', today);
+        return currentStreak;
+      } else {
+        // Streak broken, reset to 1
+        localStorage.setItem('currentStreak', '1');
+        localStorage.setItem('lastVisitDate', today);
+        return 1;
       }
     }
 

@@ -6,6 +6,7 @@
   <title>Sign In - StudyScape</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <style>
@@ -15,26 +16,30 @@
       box-sizing: border-box;
     }
 
-    body {
-      font-family: 'Inter', sans-serif;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      padding: 2rem;
-      position: relative;
-      overflow: hidden;
-    }
+   body {
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;  /* Changed from center */
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem 2rem 4rem 2rem;  /* Added bottom padding */
+  position: relative;
+  overflow-y: auto;  /* Changed from hidden */
+}
 
-    /* Animated Background */
-    .bg-shapes {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      z-index: 0;
-    }
+/* Animated Background - fix height */
+.bg-shapes {
+  position: fixed;  /* Changed from absolute */
+  width: 100%;
+  height: 100vh;  /* Fixed viewport height */
+  overflow: hidden;
+  z-index: 0;
+  top: 0;
+  left: 0;
+}
+
+
 
     .shape {
       position: absolute;
@@ -69,21 +74,24 @@
     }
 
     .container {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      max-width: 450px;
-    }
+  position: relative;
+  z-index: 2;  /* Increased z-index */
+  width: 100%;
+  max-width: 480px;
+}
 
-    .auth-card {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(20px);
-      border-radius: 24px;
-      padding: 3rem;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      animation: slideUp 0.5s ease-out;
-    }
+/* Make auth card max-height with scrolling */
+.auth-card {
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 3rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  animation: slideUpID#913881 0.5s ease-out;
+  max-height: 90vh;  /* Added max-height */
+  overflow-y: auto;  /* Added scrolling */
+}
 
     @keyframes slideUp {
       from {
@@ -113,6 +121,7 @@
     .logo p {
       color: #64748b;
       font-size: 0.95rem;
+      transition: all 0.3s ease;
     }
 
     .tabs {
@@ -168,9 +177,14 @@
       font-size: 0.9rem;
     }
 
+    .input-wrapper {
+      position: relative;
+    }
+
     .input-group input {
       width: 100%;
       padding: 0.875rem 1rem;
+      padding-right: 3rem;
       border: 2px solid #e2e8f0;
       border-radius: 12px;
       font-size: 1rem;
@@ -182,6 +196,90 @@
       outline: none;
       border-color: #667eea;
       box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .input-group input.error {
+      border-color: #ef4444;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #64748b;
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 0.25rem;
+      transition: color 0.3s;
+    }
+
+    .password-toggle:hover {
+      color: #667eea;
+    }
+
+    /* Password Strength Meter */
+    .password-strength {
+      margin-top: 0.75rem;
+      display: none;
+    }
+
+    .password-strength.show {
+      display: block;
+    }
+
+    .strength-bar {
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 0.5rem;
+    }
+
+    .strength-fill {
+      height: 100%;
+      width: 0%;
+      transition: all 0.3s ease;
+      border-radius: 10px;
+    }
+
+    .strength-weak { background: #ef4444; width: 33%; }
+    .strength-medium { background: #f59e0b; width: 66%; }
+    .strength-strong { background: #10b981; width: 100%; }
+
+    .strength-text {
+      font-size: 0.85rem;
+      color: #64748b;
+    }
+
+    .strength-text.weak { color: #ef4444; }
+    .strength-text.medium { color: #f59e0b; }
+    .strength-text.strong { color: #10b981; }
+
+    .password-requirements {
+      margin-top: 0.75rem;
+      padding: 0.75rem;
+      background: #f8fafc;
+      border-radius: 8px;
+      font-size: 0.85rem;
+    }
+
+    .requirement {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.25rem;
+      color: #64748b;
+    }
+
+    .requirement.met {
+      color: #10b981;
+    }
+
+    .requirement i {
+      font-size: 0.75rem;
     }
 
     .submit-btn {
@@ -222,6 +320,7 @@
     .submit-btn:disabled {
       opacity: 0.6;
       cursor: not-allowed;
+      transform: none;
     }
 
     .divider {
@@ -241,12 +340,52 @@
     }
 
     .divider span {
-      background: rgba(255, 255, 255, 0.95);
+      background: rgba(255, 255, 255, 0.98);
       padding: 0 1rem;
       color: #64748b;
       font-size: 0.9rem;
       position: relative;
     }
+
+    /* Social Login Buttons */
+    .social-logins {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .social-btn {
+      width: 100%;
+      padding: 0.875rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      background: white;
+      color: #334155;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      font-size: 0.95rem;
+    }
+
+    .social-btn:hover {
+      border-color: #667eea;
+      background: #f8fafc;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .social-btn i {
+      font-size: 1.1rem;
+    }
+
+    .social-btn.google:hover { border-color: #ea4335; }
+    .social-btn.github:hover { border-color: #333; }
+    .social-btn.apple:hover { border-color: #000; }
 
     .back-link {
       text-align: center;
@@ -272,6 +411,13 @@
       margin-bottom: 1rem;
       font-size: 0.9rem;
       display: none;
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
     }
 
     .success-message {
@@ -282,6 +428,35 @@
       margin-bottom: 1rem;
       font-size: 0.9rem;
       display: none;
+      animation: slideDown 0.4s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .forgot-password {
+      text-align: right;
+      margin-top: -0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .forgot-password a {
+      color: #667eea;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .forgot-password a:hover {
+      text-decoration: underline;
     }
 
     @media (max-width: 480px) {
@@ -305,7 +480,7 @@
     <div class="auth-card">
       <div class="logo">
         <h1>StudyScape ✨</h1>
-        <p>Welcome back! Let's continue learning</p>
+        <p id="subtitle">Welcome back! Let's continue learning</p>
       </div>
 
       <div class="tabs">
@@ -318,14 +493,41 @@
 
       <!-- Sign In Form -->
       <div id="signin-form" class="form-content active">
+        <div class="social-logins">
+          <button class="social-btn google" onclick="signInWithProvider('google')">
+            <i class="fab fa-google"></i>
+            Continue with Google
+          </button>
+          <button class="social-btn github" onclick="signInWithProvider('github')">
+            <i class="fab fa-github"></i>
+            Continue with GitHub
+          </button>
+          <button class="social-btn apple" onclick="signInWithProvider('apple')">
+            <i class="fab fa-apple"></i>
+            Continue with Apple
+          </button>
+        </div>
+
+        <div class="divider">
+          <span>or sign in with email</span>
+        </div>
+
         <form onsubmit="handleSignIn(event)">
           <div class="input-group">
             <label for="signin-email">Email</label>
-            <input type="email" id="signin-email" placeholder="you@example.com" required>
+            <input type="email" id="signin-email" placeholder="you@example.com" required autocomplete="email">
           </div>
           <div class="input-group">
             <label for="signin-password">Password</label>
-            <input type="password" id="signin-password" placeholder="••••••••" required>
+            <div class="input-wrapper">
+              <input type="password" id="signin-password" placeholder="••••••••" required autocomplete="current-password">
+              <button type="button" class="password-toggle" onclick="togglePassword('signin-password')">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+          </div>
+          <div class="forgot-password">
+            <a href="#" onclick="showForgotPassword()">Forgot password?</a>
           </div>
           <button type="submit" class="submit-btn">Sign In</button>
         </form>
@@ -333,25 +535,82 @@
 
       <!-- Sign Up Form -->
       <div id="signup-form" class="form-content">
+        <div class="social-logins">
+          <button class="social-btn google" onclick="signInWithProvider('google')">
+            <i class="fab fa-google"></i>
+            Continue with Google
+          </button>
+          <button class="social-btn github" onclick="signInWithProvider('github')">
+            <i class="fab fa-github"></i>
+            Continue with GitHub
+          </button>
+          <button class="social-btn apple" onclick="signInWithProvider('apple')">
+            <i class="fab fa-apple"></i>
+            Continue with Apple
+          </button>
+        </div>
+
+        <div class="divider">
+          <span>or create an account</span>
+        </div>
+
         <form onsubmit="handleSignUp(event)">
           <div class="input-group">
             <label for="signup-username">Username</label>
-            <input type="text" id="signup-username" placeholder="Choose a username" required>
+            <input type="text" id="signup-username" placeholder="Choose a username" required minlength="3" autocomplete="username">
           </div>
           <div class="input-group">
             <label for="signup-email">Email</label>
-            <input type="email" id="signup-email" placeholder="you@example.com" required>
+            <input type="email" id="signup-email" placeholder="you@example.com" required autocomplete="email">
           </div>
           <div class="input-group">
             <label for="signup-password">Password</label>
-            <input type="password" id="signup-password" placeholder="••••••••" required minlength="6">
+            <div class="input-wrapper">
+              <input type="password" id="signup-password" placeholder="Create a strong password" required minlength="8" oninput="checkPasswordStrength()" autocomplete="new-password">
+              <button type="button" class="password-toggle" onclick="togglePassword('signup-password')">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+            <div class="password-strength" id="password-strength">
+              <div class="strength-bar">
+                <div class="strength-fill" id="strength-fill"></div>
+              </div>
+              <div class="strength-text" id="strength-text">Enter a password</div>
+            </div>
+            <div class="password-requirements">
+              <div class="requirement" id="req-length">
+                <i class="fas fa-circle"></i>
+                <span>At least 8 characters</span>
+              </div>
+              <div class="requirement" id="req-uppercase">
+                <i class="fas fa-circle"></i>
+                <span>One uppercase letter</span>
+              </div>
+              <div class="requirement" id="req-number">
+                <i class="fas fa-circle"></i>
+                <span>One number</span>
+              </div>
+              <div class="requirement" id="req-special">
+                <i class="fas fa-circle"></i>
+                <span>One special character</span>
+              </div>
+            </div>
+          </div>
+          <div class="input-group">
+            <label for="signup-password-confirm">Confirm Password</label>
+            <div class="input-wrapper">
+              <input type="password" id="signup-password-confirm" placeholder="Re-enter your password" required autocomplete="new-password">
+              <button type="button" class="password-toggle" onclick="togglePassword('signup-password-confirm')">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
           </div>
           <button type="submit" class="submit-btn">Create Account</button>
         </form>
       </div>
 
       <div class="divider">
-        <span>or</span>
+        <span></span>
       </div>
 
       <div class="back-link">
@@ -361,6 +620,8 @@
   </div>
 
   <script>
+    let isSignUp = false;
+
     function switchTab(tab) {
       // Update tabs
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -370,8 +631,83 @@
       document.querySelectorAll('.form-content').forEach(f => f.classList.remove('active'));
       document.getElementById(`${tab}-form`).classList.add('active');
 
+      // Update subtitle
+      const subtitle = document.getElementById('subtitle');
+      isSignUp = tab === 'signup';
+      
+      if (isSignUp) {
+        subtitle.textContent = 'Start your learning journey today! 🚀';
+      } else {
+        subtitle.textContent = 'Welcome back! Let\'s continue learning';
+      }
+
       // Clear messages
       hideMessages();
+    }
+
+    function togglePassword(inputId) {
+      const input = document.getElementById(inputId);
+      const icon = event.currentTarget.querySelector('i');
+      
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      }
+    }
+
+    function checkPasswordStrength() {
+      const password = document.getElementById('signup-password').value;
+      const strengthDiv = document.getElementById('password-strength');
+      const fill = document.getElementById('strength-fill');
+      const text = document.getElementById('strength-text');
+      
+      if (password.length === 0) {
+        strengthDiv.classList.remove('show');
+        return;
+      }
+      
+      strengthDiv.classList.add('show');
+      
+      let strength = 0;
+      const requirements = {
+        length: password.length >= 8,
+        uppercase: /[A-Z]/.test(password),
+        lowercase: /[a-z]/.test(password),
+        number: /[0-9]/.test(password),
+        special: /[^A-Za-z0-9]/.test(password)
+      };
+      
+      // Update requirement indicators
+      document.getElementById('req-length').classList.toggle('met', requirements.length);
+      document.getElementById('req-uppercase').classList.toggle('met', requirements.uppercase);
+      document.getElementById('req-number').classList.toggle('met', requirements.number);
+      document.getElementById('req-special').classList.toggle('met', requirements.special);
+      
+      // Calculate strength
+      strength = Object.values(requirements).filter(Boolean).length;
+      
+      // Update UI
+      fill.className = 'strength-fill';
+      text.className = 'strength-text';
+      
+      if (strength <= 2) {
+        fill.classList.add('strength-weak');
+        text.classList.add('weak');
+        text.textContent = '⚠️ Weak password';
+      } else if (strength <= 4) {
+        fill.classList.add('strength-medium');
+        text.classList.add('medium');
+        text.textContent = '👍 Medium password';
+      } else {
+        fill.classList.add('strength-strong');
+        text.classList.add('strong');
+        text.textContent = '✅ Strong password';
+      }
     }
 
     function showError(message) {
@@ -393,6 +729,21 @@
       document.getElementById('success-message').style.display = 'none';
     }
 
+    async function signInWithProvider(provider) {
+      try {
+        const { data, error } = await supabase.auth.signInWithOAuth({
+          provider: provider,
+          options: {
+            redirectTo: `${window.location.origin}/dashboard.html`
+          }
+        });
+
+        if (error) throw error;
+      } catch (error) {
+        showError(`${provider} sign in failed: ${error.message}`);
+      }
+    }
+
     async function handleSignIn(e) {
       e.preventDefault();
       hideMessages();
@@ -400,7 +751,7 @@
       const email = document.getElementById('signin-email').value;
       const password = document.getElementById('signin-password').value;
 
-      const btn = e.target.querySelector('button');
+      const btn = e.target.querySelector('button[type="submit"]');
       btn.disabled = true;
       btn.textContent = 'Signing in...';
 
@@ -423,8 +774,22 @@
       const username = document.getElementById('signup-username').value;
       const email = document.getElementById('signup-email').value;
       const password = document.getElementById('signup-password').value;
+      const confirmPassword = document.getElementById('signup-password-confirm').value;
 
-      const btn = e.target.querySelector('button');
+      // Validate passwords match
+      if (password !== confirmPassword) {
+        showError('Passwords do not match!');
+        document.getElementById('signup-password-confirm').classList.add('error');
+        return;
+      }
+
+      // Validate password strength
+      if (password.length < 8) {
+        showError('Password must be at least 8 characters long');
+        return;
+      }
+
+      const btn = e.target.querySelector('button[type="submit"]');
       btn.disabled = true;
       btn.textContent = 'Creating account...';
 
@@ -435,12 +800,33 @@
         btn.disabled = false;
         btn.textContent = 'Create Account';
       } else {
-        showSuccess('Account created! Please check your email to verify your account.');
+        showSuccess('🎉 Account created! Please check your email to verify your account.');
+        // Clear form
+        document.getElementById('signup-username').value = '';
+        document.getElementById('signup-email').value = '';
+        document.getElementById('signup-password').value = '';
+        document.getElementById('signup-password-confirm').value = '';
+        
         setTimeout(() => {
           switchTab('signin');
           btn.disabled = false;
           btn.textContent = 'Create Account';
-        }, 2000);
+        }, 3000);
+      }
+    }
+
+    function showForgotPassword() {
+      const email = prompt('Enter your email address:');
+      if (email) {
+        supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/signin.html`
+        }).then(({ error }) => {
+          if (error) {
+            showError(error.message);
+          } else {
+            showSuccess('Password reset email sent! Check your inbox.');
+          }
+        });
       }
     }
 
@@ -450,6 +836,18 @@
       if (user) {
         window.location.href = 'dashboard.html';
       }
+
+      // Check for OAuth callback
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      if (hashParams.has('access_token')) {
+        showSuccess('Sign in successful! Redirecting...');
+        setTimeout(() => window.location.href = 'dashboard.html', 1000);
+      }
+    });
+
+    // Remove error class on input change
+    document.getElementById('signup-password-confirm')?.addEventListener('input', function() {
+      this.classList.remove('error');
     });
   </script>
 </body>
